@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:dslink/dslink.dart';
+import 'client.dart';
 import 'package:dslink/nodes.dart' show NodeNamer;
 
-class AddDevice extends SimpleNode {
+class AddConnection extends SimpleNode {
   static const String isType = 'addConnectionAction';
   static const String pathName = 'Add_Connection';
 
@@ -36,48 +37,46 @@ class AddDevice extends SimpleNode {
 
   LinkProvider _link;
 
-  AddDevice(String path, this._link) : super(path);
+  AddConnection(String path, this._link) : super(path);
 
   @override
   Future<Map<String, dynamic>> onInvoke(Map<String, dynamic> params) async {
     final ret = {_success: false, _message: ''};
 
-    if (params[_name] == null || params[_name].isEmpty) {
+    var rawName = params[_name];
+    if (rawName == null || rawName.isEmpty) {
       return ret..[_message] = 'A name must be specified.';
     }
-    var name = NodeNamer.createName(params[_name].trim());
+    var connectionNodeName = NodeNamer.createName(rawName.trim());
 
-    var nd = provider.getNode('/$name');
+    var nd = provider.getNode('/$connectionNodeName');
     if (nd != null) {
-      return ret..[_message] = 'A device by that name already exists.';
+      return ret..[_message] = 'A connection to a database by that name already exists.';
     }
 
-    Uri uri;
-    try {
-      uri = Uri.parse(params[_addr]);
-    } catch (e) {
-      return ret..[_message] = 'Error parsing Address: $e';
+    var address = params[_addr];
+    if (address == null || address.isEmpty) {
+      return ret..[_message] = 'The database address is invalid.';
     }
 
     var u = params[_user];
     var p = params[_pass];
-    var s = params[_sec] as bool;
-    var cl = new VClient(uri, u, p, s);
+    var cl = new MongoClient(address, u, p, rawName);
     var res = await cl.authenticate();
 
     switch (res) {
-      case AuthError.ok:
+      case AuthResult.ok:
         ret
           ..[_success] = true
           ..[_message] = 'Success!';
-        nd = provider.addNode('/$name', DeviceNode.definition(uri, u, p, s));
+//        nd = provider.addNode('/$connectionNodeName', ConnectionNode.definition(uri, u, p, s));
         _link.save();
         break;
-      case AuthError.notFound:
+      case AuthResult.notFound:
         ret[_message] = 'Unable to locate device parameters page. '
             'Possible invalid firmware version';
         break;
-      case AuthError.auth:
+      case AuthResult.auth:
         ret[_message] = 'Unable to authenticate with provided credentials';
         break;
       default:
