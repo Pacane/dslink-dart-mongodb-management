@@ -28,7 +28,6 @@ Future findByAge26(DbCollection col, Db db) async {
   sb.raw({
     'Age': {'\$eq': 26}
   });
-  col.find();
   var c = new Cursor(db, col, sb);
   var res = await c.stream.toList();
   print(res);
@@ -40,7 +39,6 @@ Future findByNameRegex(DbCollection col, Db db) async {
   sb.raw({
     'Name': {'\$regex': 'mar*', '\$options': 'i'}
   });
-  col.find();
   var c = new Cursor(db, col, sb);
   var res = await c.stream.toList();
   print(res);
@@ -52,7 +50,6 @@ Future findByNameRegexWithJSONDecode(DbCollection col, Db db) async {
   var queryString = r'{"Name": {"$regex": "mar*", "$options": "i"}}';
 
   sb.raw(JSON.decode(queryString));
-  col.find();
   var c = new Cursor(db, col, sb);
   var res = await c.stream.toList();
   print(res);

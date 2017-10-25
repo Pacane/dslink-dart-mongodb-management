@@ -2,89 +2,99 @@ import 'dart:async';
 
 import 'package:dslink/dslink.dart';
 import 'package:dslink/nodes.dart' show NodeNamer;
+import 'mongo_client.dart';
 
-class AddDevice extends SimpleNode {
+class AddConnectionParams {
+  static const String name = 'connectionName';
+  static const String addr = 'address';
+  static const String user = 'username';
+  static const String pass = 'password';
+}
+
+class AddConnection extends SimpleNode {
   static const String isType = 'addConnectionAction';
   static const String pathName = 'Add_Connection';
 
-  static const String _name = 'databaseName';
-  static const String _addr = 'address';
-  static const String _user = 'username';
-  static const String _pass = 'password';
-  static const String _success = 'success';
-  static const String _message = 'message';
 
   static Map<String, dynamic> definition() => {
-    r'$is': isType,
-    r'$name': 'Add Device',
-    r'$invokable': 'write',
-    r'$params': [
-      {'name': _name, 'type': 'string', 'placeholder': 'Database Name'},
-      {
-        'name': _addr,
-        'type': 'string',
-        'placeholder': 'mongodb://<ipaddress>'
-      },
-      {'name': _user, 'type': 'string', 'placeholder': 'Username'},
-      {'name': _pass, 'type': 'string', 'editor': 'password'},
-    ],
-    r'$columns': [
-      {'name': _success, 'type': 'bool', 'default': false},
-      {'name': _message, 'type': 'string', 'default': ''}
-    ]
-  };
+        r'$is': isType,
+        r'$name': 'Add Device',
+        r'$invokable': 'write',
+        r'$params': [
+          {'name': AddConnectionParams.name, 'type': 'string', 'placeholder': 'Database Name'},
+          {
+            'name': AddConnectionParams.addr,
+            'type': 'string',
+            'placeholder': 'mongodb://<ipaddress>'
+          },
+          {'name': AddConnectionParams.user, 'type': 'string', 'placeholder': 'Username'},
+          {'name': AddConnectionParams.pass, 'type': 'string', 'editor': 'password'},
+        ],
+      };
 
   LinkProvider _link;
 
-  AddDevice(String path, this._link) : super(path);
+  AddConnection(String path, this._link) : super(path);
 
   @override
-  Future<Map<String, dynamic>> onInvoke(Map<String, dynamic> params) async {
-    final ret = {_success: false, _message: ''};
-
-    if (params[_name] == null || params[_name].isEmpty) {
-      return ret..[_message] = 'A name must be specified.';
+  Future<Null> onInvoke(Map<String, dynamic> params) async {
+    if (params[AddConnectionParams.name] == null || params[AddConnectionParams.name].isEmpty) {
+      throw 'A connection name must be specified.';
     }
-    var name = NodeNamer.createName(params[_name].trim());
+    var name = NodeNamer.createName(params[AddConnectionParams.name].trim());
 
     var nd = provider.getNode('/$name');
     if (nd != null) {
-      return ret..[_message] = 'A device by that name already exists.';
+      throw "There's already a connection with that name that exists.";
     }
 
     Uri uri;
     try {
-      uri = Uri.parse(params[_addr]);
+      uri = Uri.parse(params[AddConnectionParams.addr]);
     } catch (e) {
-      return ret..[_message] = 'Error parsing Address: $e';
+      throw 'Error parsing Address: $e';
     }
 
-    var u = params[_user];
-    var p = params[_pass];
-    var s = params[_sec] as bool;
-    var cl = new VClient(uri, u, p, s);
-    var res = await cl.authenticate();
+    var u = params[AddConnectionParams.user];
+    var p = params[AddConnectionParams.pass];
+
+    var cl = new MongoClient(uri, u, p);
+    var res = await cl.testConnection();
 
     switch (res) {
-      case AuthError.ok:
-        ret
-          ..[_success] = true
-          ..[_message] = 'Success!';
-        nd = provider.addNode('/$name', DeviceNode.definition(uri, u, p, s));
+      case AuthResult.ok:
+        nd = provider.addNode('/$name', DatabaseNode.definition(uri, u, p));
         _link.save();
+        return;
+      case AuthResult.notFound:
+        throw 'Unable to locate device parameters page. Possible invalid firmware version';
         break;
-      case AuthError.notFound:
-        ret[_message] = 'Unable to locate device parameters page. '
-            'Possible invalid firmware version';
-        break;
-      case AuthError.auth:
-        ret[_message] = 'Unable to authenticate with provided credentials';
+      case AuthResult.authError:
+        throw 'Unable to authenticate with provided credentials';
         break;
       default:
-        ret[_message] = 'Unknown error occured. Check log file for errors';
+        throw 'Unknown error occured. Check log file for errors';
         break;
     }
-
-    return ret;
   }
 }
+
+class DatabaseNode extends SimpleNode {
+  static String isType = 'databaseNode';
+  static Map<String, dynamic> definition(
+          Uri uri, String username, String password) =>
+      {
+        r'$is': isType,
+        r'$name': 'Add Device',
+        _uri: uri.toString(),
+        _user: username,
+        _pass: password,
+      };
+
+  static const String _user = r'$$username';
+  static const String _pass = r'$$password';
+  static const String _uri = r'$$uri';
+
+  DatabaseNode(String path) : super(path);
+}
+
