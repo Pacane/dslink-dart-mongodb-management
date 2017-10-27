@@ -9,26 +9,59 @@ class AddConnectionParams {
   static const String addr = 'address';
   static const String user = 'username';
   static const String pass = 'password';
+
+  static void validateParams(Map<String, String> params) {
+    if (params[AddConnectionParams.name] == null ||
+        params[AddConnectionParams.name].isEmpty) {
+      throw 'A connection name must be specified.';
+    }
+
+    if (params[AddConnectionParams.user] == null ||
+        params[AddConnectionParams.user].isEmpty) {
+      throw 'A username must be specified.';
+    }
+
+    if (params[AddConnectionParams.pass] == null ||
+        params[AddConnectionParams.pass].isEmpty) {
+      throw 'A password must be specified.';
+    }
+
+    if (params[AddConnectionParams.addr] == null ||
+        params[AddConnectionParams.addr].isEmpty) {
+      throw 'An address must be specified.';
+    }
+  }
 }
 
 class AddConnection extends SimpleNode {
   static const String isType = 'addConnectionAction';
   static const String pathName = 'Add_Connection';
 
-
   static Map<String, dynamic> definition() => {
         r'$is': isType,
         r'$name': 'Add Device',
         r'$invokable': 'write',
         r'$params': [
-          {'name': AddConnectionParams.name, 'type': 'string', 'placeholder': 'Database Name'},
+          {
+            'name': AddConnectionParams.name,
+            'type': 'string',
+            'placeholder': 'Database Name'
+          },
           {
             'name': AddConnectionParams.addr,
             'type': 'string',
             'placeholder': 'mongodb://<ipaddress>'
           },
-          {'name': AddConnectionParams.user, 'type': 'string', 'placeholder': 'Username'},
-          {'name': AddConnectionParams.pass, 'type': 'string', 'editor': 'password'},
+          {
+            'name': AddConnectionParams.user,
+            'type': 'string',
+            'placeholder': 'Username'
+          },
+          {
+            'name': AddConnectionParams.pass,
+            'type': 'string',
+            'editor': 'password'
+          },
         ],
       };
 
@@ -38,9 +71,8 @@ class AddConnection extends SimpleNode {
 
   @override
   Future<Null> onInvoke(Map<String, dynamic> params) async {
-    if (params[AddConnectionParams.name] == null || params[AddConnectionParams.name].isEmpty) {
-      throw 'A connection name must be specified.';
-    }
+    AddConnectionParams.validateParams(params);
+
     var name = NodeNamer.createName(params[AddConnectionParams.name].trim());
 
     var nd = provider.getNode('/$name');
@@ -81,6 +113,7 @@ class AddConnection extends SimpleNode {
 
 class DatabaseNode extends SimpleNode {
   static String isType = 'databaseNode';
+
   static Map<String, dynamic> definition(
           Uri uri, String username, String password) =>
       {
@@ -97,4 +130,3 @@ class DatabaseNode extends SimpleNode {
 
   DatabaseNode(String path) : super(path);
 }
-
