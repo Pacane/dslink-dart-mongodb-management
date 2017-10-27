@@ -33,8 +33,8 @@ main() {
     });
 
     test('returns notFound when wrong server', () async {
-      var client =
-          new MongoClient(uri.replace(host: 'wrongserver'), username, password);
+      var wrongUri = uri.replace(host: 'wrongserver');
+      var client = new MongoClient(wrongUri, username, password);
 
       var result = await client.testConnection();
 
