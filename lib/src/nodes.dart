@@ -30,6 +30,12 @@ class AddConnectionParams {
         params[AddConnectionParams.addr].isEmpty) {
       throw 'An address must be specified.';
     }
+
+    try {
+      Uri.parse(params[AddConnectionParams.addr]);
+    } catch (e) {
+      throw 'Error parsing Address: $e';
+    }
   }
 }
 
@@ -80,22 +86,18 @@ class AddConnection extends SimpleNode {
       throw "There's already a connection with that name that exists.";
     }
 
-    Uri uri;
-    try {
-      uri = Uri.parse(params[AddConnectionParams.addr]);
-    } catch (e) {
-      throw 'Error parsing Address: $e';
-    }
+    var username = params[AddConnectionParams.user];
+    var password = params[AddConnectionParams.pass];
+    var address = params[AddConnectionParams.addr];
+    var parsedAddress = Uri.parse(address);
 
-    var u = params[AddConnectionParams.user];
-    var p = params[AddConnectionParams.pass];
-
-    var cl = new MongoClient(uri, u, p);
+    var cl = new MongoClient(parsedAddress, username, password);
     var res = await cl.testConnection();
 
     switch (res) {
       case AuthResult.ok:
-        nd = provider.addNode('/$name', DatabaseNode.definition(uri, u, p));
+        nd = provider.addNode(
+            '/$name', DatabaseNode.definition(address, username, password));
         _link.save();
         return;
       case AuthResult.notFound:
@@ -104,6 +106,7 @@ class AddConnection extends SimpleNode {
       case AuthResult.authError:
         throw 'Unable to authenticate with provided credentials';
         break;
+      case AuthResult.other:
       default:
         throw 'Unknown error occured. Check log file for errors';
         break;
@@ -115,18 +118,18 @@ class DatabaseNode extends SimpleNode {
   static String isType = 'databaseNode';
 
   static Map<String, dynamic> definition(
-          Uri uri, String username, String password) =>
+          String address, String username, String password) =>
       {
         r'$is': isType,
         r'$name': 'Add Device',
-        _uri: uri.toString(),
+        _address: address,
         _user: username,
         _pass: password,
       };
 
   static const String _user = r'$$username';
   static const String _pass = r'$$password';
-  static const String _uri = r'$$uri';
+  static const String _address = r'$$uri';
 
   DatabaseNode(String path) : super(path);
 }
