@@ -6,10 +6,17 @@ class MongoClient {
   final Uri uri;
   final String username;
   final String password;
+  final ConnectionPool connectionPool;
+
+  static const int maxConnections = 3;
 
   Db db;
 
-  MongoClient(this.uri, this.username, this.password);
+  MongoClient(this.uri, this.username, this.password)
+      : connectionPool = new ConnectionPool(
+            maxConnections,
+            () => new Db(
+                makeAuthenticatedUri(uri, username, password).toString()));
 
   Future<AuthResult> testConnection() async {
     var uriWithAuth = makeAuthenticatedUri(uri, username, password);
@@ -28,6 +35,12 @@ class MongoClient {
         return AuthResult.other;
       }
     }
+  }
+
+  /// List collection names for a given database
+  Future<List<String>> listCollections() async {
+    var db = await connectionPool.connect();
+    return db.getCollectionNames();
   }
 }
 

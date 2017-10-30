@@ -96,8 +96,8 @@ class AddConnection extends SimpleNode {
 
     switch (res) {
       case AuthResult.ok:
-        nd = provider.addNode(
-            '/$name', DatabaseNode.definition(address, username, password));
+        nd = provider.addNode('/$name',
+            DatabaseNode.definition(address, username, password, name));
         _link.save();
         return;
       case AuthResult.notFound:
@@ -117,11 +117,11 @@ class AddConnection extends SimpleNode {
 class DatabaseNode extends SimpleNode {
   static String isType = 'databaseNode';
 
-  static Map<String, dynamic> definition(
-          String address, String username, String password) =>
+  static Map<String, dynamic> definition(String address, String username,
+          String password, String connectionName) =>
       {
         r'$is': isType,
-        r'$name': 'Add Device',
+        r'$name': connectionName,
         _address: address,
         _user: username,
         _pass: password,
@@ -131,5 +131,77 @@ class DatabaseNode extends SimpleNode {
   static const String _pass = r'$$password';
   static const String _address = r'$$uri';
 
+  String username;
+  String password;
+  String address;
+
   DatabaseNode(String path) : super(path);
+
+  @override
+  void onCreated() {
+    username = configs[r'$$username'];
+    password = configs[r'$$password'];
+    address = configs[r'$$uri'];
+
+    var client = new MongoClient(Uri.parse(address), username, password);
+
+    client.listCollections().then((collections) {
+      for (var collectionName in collections) {
+        provider.addNode('${path}/$collectionName',
+            CollectionNode.definition(collectionName));
+      }
+    });
+  }
+}
+
+class CollectionNode extends SimpleNode {
+  static String isType = 'collectionNode';
+
+  CollectionNode(String path) : super(path);
+
+  static Map<String, dynamic> definition(String collectionName) => {
+        r'$is': isType,
+        r'$name': NodeNamer.createName(collectionName),
+        r'$collectionName': collectionName,
+        QueryNode.pathName: QueryNode.definition(collectionName),
+      };
+}
+
+class QueryNode extends SimpleNode {
+  static const String pathName = 'query';
+
+  QueryNode(String path) : super(path);
+
+  static const String isType = 'queryNode';
+
+  static Map<String, dynamic> definition(String collectionName) => {
+        r"$name": "Evaluate Raw Query",
+        r"$is": isType,
+        r"$invokable": "read",
+        r"$params": [
+          {
+            "name": "code",
+            "type": "string",
+            "editor": 'textarea',
+            "description": "Raw query code",
+            "placeholder": "{}"
+          },
+          {
+            "name": "limit",
+            "type": "number",
+            "default": 0,
+            "description":
+                "max number of items in the query (0 equals no limit)",
+          },
+          {
+            "name": "skip",
+            "type": "number",
+            "default": 0,
+            "description": "Amount of results to skip for the query",
+          },
+        ],
+        r'$columns': [
+          {"name": "json", "type": "string"}
+        ],
+      };
 }
