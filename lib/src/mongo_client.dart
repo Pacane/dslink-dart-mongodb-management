@@ -28,6 +28,8 @@ class MongoClient {
       return AuthResult.ok;
     } on SocketException catch (_) {
       return AuthResult.notFound;
+    } on MongoDartError catch (_) {
+      rethrow;
     } catch (e) {
       if (e['code'] == 18) {
         return AuthResult.authError;

@@ -6,8 +6,6 @@ main(List<String> args) async {
 
   link = new LinkProvider(args, "MongoDB-", autoInitialize: false, profiles: {
     AddConnection.isType: (String path) => new AddConnection(path, link),
-    DatabaseNode.isType: (String path) => new DatabaseNode(path),
-    QueryNode.isType: (String path) => new QueryNode(path),
   }, defaultNodes: {
     AddConnection.pathName: AddConnection.definition()
   });

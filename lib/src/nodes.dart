@@ -96,8 +96,9 @@ class AddConnection extends SimpleNode {
 
     switch (res) {
       case AuthResult.ok:
-        nd = provider.addNode('/$name',
-            DatabaseNode.definition(address, username, password, name));
+        var dbNode = new DatabaseNode('/$name', cl);
+        dbNode.load(DatabaseNode.definition(address, username, password, name));
+        provider.setNode('/$name', dbNode);
         _link.save();
         return;
       case AuthResult.notFound:
@@ -131,50 +132,58 @@ class DatabaseNode extends SimpleNode {
   static const String _pass = r'$$password';
   static const String _address = r'$$uri';
 
-  String username;
-  String password;
-  String address;
+  final MongoClient client;
 
-  DatabaseNode(String path) : super(path);
+  DatabaseNode(String path, this.client) : super(path);
+
+  DatabaseNode.withCustomProvider(
+      String path, this.client, SimpleNodeProvider provider)
+      : super(path, provider);
 
   @override
-  void onCreated() {
-    username = configs[r'$$username'];
-    password = configs[r'$$password'];
-    address = configs[r'$$uri'];
-
-    var client = new MongoClient(Uri.parse(address), username, password);
-
-    client.listCollections().then((collections) {
+  Future<Null> onCreated() {
+    return client.listCollections().then((collections) {
       for (var collectionName in collections) {
-        provider.addNode('${path}/$collectionName',
-            CollectionNode.definition(collectionName));
+        var collectionNode =
+            new CollectionNode('$path/$collectionName', client);
+        collectionNode.load(CollectionNode.definition(collectionName));
+        provider.setNode(collectionNode.path, collectionNode);
       }
     });
   }
 }
 
 class CollectionNode extends SimpleNode {
-  static String isType = 'collectionNode';
+  static const String isType = 'collectionNode';
 
-  CollectionNode(String path) : super(path);
+  final MongoClient client;
+
+  CollectionNode(String path, this.client) : super(path);
 
   static Map<String, dynamic> definition(String collectionName) => {
         r'$is': isType,
         r'$name': NodeNamer.createName(collectionName),
         r'$collectionName': collectionName,
-        QueryNode.pathName: QueryNode.definition(collectionName),
       };
+
+  @override
+  void onCreated() {
+    var queryNode = new QueryNode('$path/${QueryNode.pathName}', client);
+    queryNode.load(QueryNode.definition());
+    provider.setNode(queryNode.path, queryNode);
+  }
 }
 
 class QueryNode extends SimpleNode {
   static const String pathName = 'query';
 
-  QueryNode(String path) : super(path);
+  final MongoClient client;
+
+  QueryNode(String path, this.client) : super(path);
 
   static const String isType = 'queryNode';
 
-  static Map<String, dynamic> definition(String collectionName) => {
+  static Map<String, dynamic> definition() => {
         r"$name": "Evaluate Raw Query",
         r"$is": isType,
         r"$invokable": "read",
