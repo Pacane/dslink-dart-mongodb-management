@@ -10,11 +10,16 @@ class CollectionNode extends SimpleNode {
 
   CollectionNode(String path, this.client) : super(path);
 
+  /// For testing purpose only
+  CollectionNode.withCustomProvider(
+      String path, this.client, SimpleNodeProvider provider)
+      : super(path, provider);
+
   static Map<String, dynamic> definition(String collectionName) => {
-    r'$is': isType,
-    r'$name': NodeNamer.createName(collectionName),
-    r'$collectionName': collectionName,
-  };
+        r'$is': isType,
+        r'$name': NodeNamer.createName(collectionName),
+        r'$collectionName': collectionName,
+      };
 
   @override
   void onCreated() {
@@ -23,4 +28,3 @@ class CollectionNode extends SimpleNode {
     provider.setNode(queryNode.path, queryNode);
   }
 }
-
