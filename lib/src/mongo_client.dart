@@ -2,6 +2,11 @@ import 'dart:io';
 import 'dart:async';
 import 'package:mongo_dart/mongo_dart.dart';
 
+class MongoClientFactory {
+  MongoClient create(Uri uri, String username, String password) =>
+      new MongoClient(uri, username, password);
+}
+
 class MongoClient {
   final Uri uri;
   final String username;

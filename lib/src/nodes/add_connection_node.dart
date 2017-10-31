@@ -40,40 +40,47 @@ class AddConnectionParams {
 }
 
 class AddConnectionNode extends SimpleNode {
-  AddConnectionNode(String path, this._link) : super(path);
+  AddConnectionNode(String path, this._link, this.mongoClientFactory)
+      : super(path);
+
+  /// Used for testing only
+  AddConnectionNode.withCustomProvider(String path, this._link,
+      this.mongoClientFactory, SimpleNodeProvider provider)
+      : super(path, provider);
 
   static const String isType = 'addConnectionAction';
   static const String pathName = 'Add_Connection';
 
   static Map<String, dynamic> definition() => {
-    r'$is': isType,
-    r'$name': 'Add Device',
-    r'$invokable': 'write',
-    r'$params': [
-      {
-        'name': AddConnectionParams.name,
-        'type': 'string',
-        'placeholder': 'Database Name'
-      },
-      {
-        'name': AddConnectionParams.addr,
-        'type': 'string',
-        'placeholder': 'mongodb://<ipaddress>'
-      },
-      {
-        'name': AddConnectionParams.user,
-        'type': 'string',
-        'placeholder': 'Username'
-      },
-      {
-        'name': AddConnectionParams.pass,
-        'type': 'string',
-        'editor': 'password'
-      },
-    ],
-  };
+        r'$is': isType,
+        r'$name': 'Add Device',
+        r'$invokable': 'write',
+        r'$params': [
+          {
+            'name': AddConnectionParams.name,
+            'type': 'string',
+            'placeholder': 'Database Name'
+          },
+          {
+            'name': AddConnectionParams.addr,
+            'type': 'string',
+            'placeholder': 'mongodb://<ipaddress>'
+          },
+          {
+            'name': AddConnectionParams.user,
+            'type': 'string',
+            'placeholder': 'Username'
+          },
+          {
+            'name': AddConnectionParams.pass,
+            'type': 'string',
+            'editor': 'password'
+          },
+        ],
+      };
 
   LinkProvider _link;
+  final MongoClientFactory mongoClientFactory;
 
   @override
   Future<Null> onInvoke(Map<String, dynamic> params) async {
@@ -91,7 +98,7 @@ class AddConnectionNode extends SimpleNode {
     final address = params[AddConnectionParams.addr];
     final parsedAddress = Uri.parse(address);
 
-    final cl = new MongoClient(parsedAddress, username, password);
+    final cl = mongoClientFactory.create(parsedAddress, username, password);
     final res = await cl.testConnection();
 
     switch (res) {
@@ -102,7 +109,7 @@ class AddConnectionNode extends SimpleNode {
         _link.save();
         return;
       case AuthResult.notFound:
-        throw 'Unable to locate device parameters page. Possible invalid firmware version';
+        throw 'Unable to reach the database';
         break;
       case AuthResult.authError:
         throw 'Unable to authenticate with provided credentials';
@@ -114,4 +121,3 @@ class AddConnectionNode extends SimpleNode {
     }
   }
 }
-

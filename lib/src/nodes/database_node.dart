@@ -6,6 +6,7 @@ import 'collection_node.dart';
 class DatabaseNode extends SimpleNode {
   DatabaseNode(String path, this.client) : super(path);
 
+  /// Used for testing only
   DatabaseNode.withCustomProvider(
       String path, this.client, SimpleNodeProvider provider)
       : super(path, provider);
