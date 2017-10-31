@@ -1,4 +1,4 @@
-name: mongo_test_permissions
+name: dslink_dslink_mongodb_management
 description: A sample command-line application.
 version: 0.0.1
 
@@ -10,3 +10,4 @@ dependencies:
     git: https://github.com/IOT-DSA/sdk-dslink-dart
 dev_dependencies:
   test: '^0.12.24+1'
+  mockito: '^2.2.0'
