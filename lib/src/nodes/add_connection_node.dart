@@ -4,31 +4,35 @@ import 'package:dslink/nodes.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'database_node.dart';
 
+bool isNullOrEmpty(String s) => s == null || s.isEmpty;
+
 class AddConnectionParams {
   static const String name = 'connectionName';
   static const String addr = 'address';
   static const String user = 'username';
   static const String pass = 'password';
 
+  static const String emptyNameErrorMsg =
+      'A connection name must be specified.';
+  static const String emptyUsernameErrorMsg = 'A username must be specified.';
+  static const String emptyPasswordErrorMsg = 'A password must be specified.';
+  static const String emptyAddressErrorMsg = 'An address must be specified.';
+
   static void validateParams(Map<String, String> params) {
-    if (params[AddConnectionParams.name] == null ||
-        params[AddConnectionParams.name].isEmpty) {
-      throw 'A connection name must be specified.';
+    if (isNullOrEmpty(params[AddConnectionParams.name])) {
+      throw emptyNameErrorMsg;
     }
 
-    if (params[AddConnectionParams.user] == null ||
-        params[AddConnectionParams.user].isEmpty) {
-      throw 'A username must be specified.';
+    if (isNullOrEmpty(params[AddConnectionParams.user])) {
+      throw emptyUsernameErrorMsg;
     }
 
-    if (params[AddConnectionParams.pass] == null ||
-        params[AddConnectionParams.pass].isEmpty) {
-      throw 'A password must be specified.';
+    if (isNullOrEmpty(params[AddConnectionParams.pass])) {
+      throw emptyPasswordErrorMsg;
     }
 
-    if (params[AddConnectionParams.addr] == null ||
-        params[AddConnectionParams.addr].isEmpty) {
-      throw 'An address must be specified.';
+    if (isNullOrEmpty(params[AddConnectionParams.addr])) {
+      throw emptyAddressErrorMsg;
     }
 
     try {

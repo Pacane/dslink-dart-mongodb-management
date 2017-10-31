@@ -40,7 +40,7 @@ void main() {
       expect(
           () => AddConnectionParams
               .validateParams(validParams..remove(AddConnectionParams.name)),
-          throwsA('A connection name must be specified.'));
+          throwsA(AddConnectionParams.emptyNameErrorMsg));
     });
 
     test("throws error when user is empty", () async {
