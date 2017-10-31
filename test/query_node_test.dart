@@ -19,11 +19,13 @@ void main() {
   });
 
   group('Null parameters validation', () {
-    for (var testCase in [
+    final testCases = [
       const Tuple(QueryNodeParams.code, QueryNodeParams.invalidCodeErrorMsg),
       const Tuple(QueryNodeParams.limit, QueryNodeParams.invalidLimitErrorMsg),
       const Tuple(QueryNodeParams.skip, QueryNodeParams.invalidSkipErrorMsg),
-    ]) {
+    ];
+
+    for (var testCase in testCases) {
       test('Throws when $testCase is null', () {
         expect(
             () => QueryNodeParams
