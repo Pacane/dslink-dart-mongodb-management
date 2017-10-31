@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dslink/dslink.dart';
 import 'package:dslink/nodes.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:dslink_dslink_mongodb_management/nodes.dart';
@@ -66,10 +67,12 @@ void main() {
   });
 
   group('onInvoke', () {
+    final expectedDbNodePath = '/${NodeNamer.createName(connectionName)}';
+    final someNode = new SimpleNode('somePath');
+
     test('adds database node', () async {
       when(mongoClient.testConnection())
           .thenReturn(new Future.value(AuthResult.ok));
-      final expectedDbNodePath = '/${NodeNamer.createName(connectionName)}';
 
       await node.onInvoke(validParams);
 
@@ -78,6 +81,14 @@ void main() {
               .captured
               .first;
       expect(childQueryNode, const isInstanceOf<DatabaseNode>());
+    });
+
+    test('throws an error when a connection with that name already exists',
+        () async {
+      when(provider.getNode(expectedDbNodePath)).thenReturn(someNode);
+
+      expect(() => node.onInvoke(validParams),
+          throwsA(AddConnectionNode.connectionAlreadyExistErrorMsg));
     });
   });
 }

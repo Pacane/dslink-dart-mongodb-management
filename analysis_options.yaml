@@ -11,7 +11,6 @@ linter:
     - always_put_required_named_parameters_first
     - annotate_overrides
     - avoid_annotating_with_dynamic
-    - avoid_as
     - avoid_classes_with_only_static_members
     - avoid_empty_else
     - avoid_function_literals_in_foreach_calls

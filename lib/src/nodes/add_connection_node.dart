@@ -52,6 +52,8 @@ class AddConnectionNode extends SimpleNode {
       this.mongoClientFactory, SimpleNodeProvider provider)
       : super(path, provider);
 
+  static const String connectionAlreadyExistErrorMsg =
+      "There's already a connection with that name that exists.";
   static const String isType = 'addConnectionAction';
   static const String pathName = 'Add_Connection';
 
@@ -94,7 +96,7 @@ class AddConnectionNode extends SimpleNode {
 
     final nd = provider.getNode('/$name');
     if (nd != null) {
-      throw "There's already a connection with that name that exists.";
+      throw connectionAlreadyExistErrorMsg;
     }
 
     final username = params[AddConnectionParams.user];
