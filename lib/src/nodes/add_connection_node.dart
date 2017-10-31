@@ -57,7 +57,7 @@ class AddConnectionNode extends SimpleNode {
 
   static Map<String, dynamic> definition() => {
         r'$is': isType,
-        r'$name': 'Add Device',
+        r'$name': 'Add Connection',
         r'$invokable': 'write',
         r'$params': [
           {

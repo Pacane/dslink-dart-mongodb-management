@@ -4,9 +4,15 @@ import 'package:test/test.dart';
 
 void main() {
   group('test connection', () {
-    final uri = Uri.parse(Platform.environment['DB_URI']);
+    final uriString = Platform.environment['DB_URI'];
     final username = Platform.environment['DB_USERNAME'];
     final password = Platform.environment['DB_PASSWORD'];
+
+    assert(uriString != null);
+    assert(username != null);
+    assert(password != null);
+
+    final uri = Uri.parse(uriString);
 
     test('returns OK when success', () async {
       final client = new MongoClient(uri, username, password);

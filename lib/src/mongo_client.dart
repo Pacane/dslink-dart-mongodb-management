@@ -15,8 +15,6 @@ class MongoClient {
 
   static const int maxConnections = 3;
 
-  Db db;
-
   MongoClient(this.uri, this.username, this.password)
       : connectionPool = new ConnectionPool(
             maxConnections,
@@ -26,7 +24,7 @@ class MongoClient {
   Future<AuthResult> testConnection() async {
     final uriWithAuth = makeAuthenticatedUri(uri, username, password);
 
-    db = new Db(uriWithAuth.toString());
+    final db = new Db(uriWithAuth.toString());
     try {
       await db.open();
       await db.close();
