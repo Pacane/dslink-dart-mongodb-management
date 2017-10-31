@@ -24,7 +24,8 @@ void main() {
     node = new AddConnectionNode.withCustomProvider(
         'path', link, mongoClientFactory, provider);
 
-    when(mongoClientFactory.create(any, any, any)).thenReturn(mongoClient);
+    when(mongoClientFactory.create(Uri.parse(address), username, password))
+        .thenReturn(mongoClient);
 
     validParams = {
       AddConnectionParams.name: connectionName,
