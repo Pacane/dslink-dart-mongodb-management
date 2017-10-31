@@ -11,11 +11,13 @@ void main() {
   SimpleNodeProvider provider;
 
   final path = '/somePath';
+  final collectionName = 'some name';
 
   setUp(() {
     mongoClient = new MongoClientMock();
     provider = new ProviderMock();
-    node = new CollectionNode.withCustomProvider(path, mongoClient, provider);
+    node = new CollectionNode.withCustomProvider(
+        path, mongoClient, collectionName, provider);
   });
 
   group('adding actions onCreated', () {
@@ -23,10 +25,10 @@ void main() {
       node.onCreated();
 
       final queryNode =
-          verify(provider.setNode('$path/${QueryNode.pathName}', captureAny))
+          verify(provider.setNode('$path/${FindNode.pathName}', captureAny))
               .captured
               .first;
-      expect(queryNode, const isInstanceOf<QueryNode>());
+      expect(queryNode, const isInstanceOf<FindNode>());
     });
   });
 }

@@ -47,6 +47,10 @@ class MongoClient {
     final db = await connectionPool.connect();
     return db.getCollectionNames();
   }
+
+  Future<List<Map>> find(String collectionName, code, limit, skip) async {
+    return [{}];
+  }
 }
 
 enum AuthResult { ok, authError, notFound, other }
