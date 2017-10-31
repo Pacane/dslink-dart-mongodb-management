@@ -40,6 +40,8 @@ class AddConnectionParams {
 }
 
 class AddConnectionNode extends SimpleNode {
+  AddConnectionNode(String path, this._link) : super(path);
+
   static const String isType = 'addConnectionAction';
   static const String pathName = 'Add_Connection';
 
@@ -73,30 +75,28 @@ class AddConnectionNode extends SimpleNode {
 
   LinkProvider _link;
 
-  AddConnectionNode(String path, this._link) : super(path);
-
   @override
   Future<Null> onInvoke(Map<String, dynamic> params) async {
     AddConnectionParams.validateParams(params);
 
-    var name = NodeNamer.createName(params[AddConnectionParams.name].trim());
+    final name = NodeNamer.createName(params[AddConnectionParams.name].trim());
 
-    var nd = provider.getNode('/$name');
+    final nd = provider.getNode('/$name');
     if (nd != null) {
       throw "There's already a connection with that name that exists.";
     }
 
-    var username = params[AddConnectionParams.user];
-    var password = params[AddConnectionParams.pass];
-    var address = params[AddConnectionParams.addr];
-    var parsedAddress = Uri.parse(address);
+    final username = params[AddConnectionParams.user];
+    final password = params[AddConnectionParams.pass];
+    final address = params[AddConnectionParams.addr];
+    final parsedAddress = Uri.parse(address);
 
-    var cl = new MongoClient(parsedAddress, username, password);
-    var res = await cl.testConnection();
+    final cl = new MongoClient(parsedAddress, username, password);
+    final res = await cl.testConnection();
 
     switch (res) {
       case AuthResult.ok:
-        var dbNode = new DatabaseNode('/$name', cl);
+        final dbNode = new DatabaseNode('/$name', cl);
         dbNode.load(DatabaseNode.definition(address, username, password, name));
         provider.setNode('/$name', dbNode);
         _link.save();
@@ -116,6 +116,12 @@ class AddConnectionNode extends SimpleNode {
 }
 
 class DatabaseNode extends SimpleNode {
+  DatabaseNode(String path, this.client) : super(path);
+
+  DatabaseNode.withCustomProvider(
+      String path, this.client, SimpleNodeProvider provider)
+      : super(path, provider);
+
   static String isType = 'databaseNode';
 
   static Map<String, dynamic> definition(String address, String username,
@@ -134,23 +140,15 @@ class DatabaseNode extends SimpleNode {
 
   final MongoClient client;
 
-  DatabaseNode(String path, this.client) : super(path);
-
-  DatabaseNode.withCustomProvider(
-      String path, this.client, SimpleNodeProvider provider)
-      : super(path, provider);
-
   @override
-  Future<Null> onCreated() {
-    return client.listCollections().then((collections) {
-      for (var collectionName in collections) {
-        var collectionNode =
-            new CollectionNode('$path/$collectionName', client);
-        collectionNode.load(CollectionNode.definition(collectionName));
-        provider.setNode(collectionNode.path, collectionNode);
-      }
-    });
-  }
+  Future<Null> onCreated() => client.listCollections().then((collections) {
+        for (final collectionName in collections) {
+          final collectionNode =
+              new CollectionNode('$path/$collectionName', client);
+          collectionNode.load(CollectionNode.definition(collectionName));
+          provider.setNode(collectionNode.path, collectionNode);
+        }
+      });
 }
 
 class CollectionNode extends SimpleNode {
@@ -168,7 +166,7 @@ class CollectionNode extends SimpleNode {
 
   @override
   void onCreated() {
-    var queryNode = new QueryNode('$path/${QueryNode.pathName}', client);
+    final queryNode = new QueryNode('$path/${QueryNode.pathName}', client);
     queryNode.load(QueryNode.definition());
     provider.setNode(queryNode.path, queryNode);
   }

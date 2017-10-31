@@ -1,6 +1,6 @@
+import 'dart:io';
 import 'dart:async';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'dart:io';
 
 class MongoClient {
   final Uri uri;
@@ -19,12 +19,12 @@ class MongoClient {
                 makeAuthenticatedUri(uri, username, password).toString()));
 
   Future<AuthResult> testConnection() async {
-    var uriWithAuth = makeAuthenticatedUri(uri, username, password);
+    final uriWithAuth = makeAuthenticatedUri(uri, username, password);
 
     db = new Db(uriWithAuth.toString());
     try {
       await db.open();
-      db.close();
+      await db.close();
       return AuthResult.ok;
     } on SocketException catch (_) {
       return AuthResult.notFound;
@@ -41,7 +41,7 @@ class MongoClient {
 
   /// List collection names for a given database
   Future<List<String>> listCollections() async {
-    var db = await connectionPool.connect();
+    final db = await connectionPool.connect();
     return db.getCollectionNames();
   }
 }

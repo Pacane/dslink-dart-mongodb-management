@@ -7,9 +7,9 @@ class MockLink extends Mock implements LinkProvider {}
 
 class MockMongoClient extends Mock implements MongoClient {}
 
-main() {
-  var link = new MockLink();
-  var client = new MockMongoClient();
+void main() {
+  final link = new MockLink();
+  final client = new MockMongoClient();
   SimpleNode node;
   Map<String, String> validParams;
 

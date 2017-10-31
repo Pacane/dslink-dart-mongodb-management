@@ -10,11 +10,11 @@ class ProviderMock extends Mock implements SimpleNodeProvider {}
 class MongoClientMock extends Mock implements MongoClient {}
 
 void main() {
-  var path = '/pathName';
+  final path = '/pathName';
   SimpleNodeProvider provider;
   MongoClient mongoClient;
 
-  SimpleNode dbNode;
+  DatabaseNode dbNode;
 
   setUp(() {
     mongoClient = new MongoClientMock();
@@ -23,18 +23,18 @@ void main() {
   });
 
   test('create collections nodes', () async {
-    var collections = ['collection1', 'collection2'];
+    final collections = ['collection1', 'collection2'];
     when(mongoClient.listCollections())
         .thenReturn(new Future.value(collections));
 
     await dbNode.onCreated();
 
-    for (var collection in collections) {
-      var collectionNodePath = '$path/$collection';
-      var child = verify(provider.setNode(collectionNodePath, captureAny))
+    for (final collection in collections) {
+      final collectionNodePath = '$path/$collection';
+      final child = verify(provider.setNode(collectionNodePath, captureAny))
           .captured
           .first;
-      expect(child, new isInstanceOf<CollectionNode>());
+      expect(child, const isInstanceOf<CollectionNode>());
     }
   });
 }

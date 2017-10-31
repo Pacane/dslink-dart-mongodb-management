@@ -4,13 +4,13 @@ import 'dart:math';
 import 'package:dslink/dslink.dart';
 
 Future main(List<String> args) async {
-  var link = new LinkProvider(args, "Example-",
+  final link = new LinkProvider(args, "Example-",
       profiles: {TesterNode.isType: (String path) => new TesterNode(path)});
 
-  var numGen = new Random();
+  final numGen = new Random();
   var myNum = numGen.nextInt(50);
 
-  var myNode = link.addNode('/MyNum', {
+  final myNode = link.addNode('/MyNum', {
     r'$name': 'My Number',
     r'$type': 'num',
     r'?value': myNum,
@@ -31,6 +31,8 @@ Future main(List<String> args) async {
 }
 
 class TesterNode extends SimpleNode {
+  TesterNode(String path) : super(path);
+
   static const String isType = 'testerNode';
   static const String pathName = 'Test_Node';
 
@@ -44,12 +46,9 @@ class TesterNode extends SimpleNode {
         r'$columns': []
       };
 
-  TesterNode(String path) : super(path);
 
   @override
   Future<Map<String, dynamic>> onInvoke(Map<String, dynamic> params) async {
     throw new Exception("That's broken");
-
-    return {};
   }
 }
