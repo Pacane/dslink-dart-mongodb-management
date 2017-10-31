@@ -5,9 +5,9 @@ main(List<String> args) async {
   LinkProvider link;
 
   link = new LinkProvider(args, "MongoDB-", autoInitialize: false, profiles: {
-    AddConnection.isType: (String path) => new AddConnection(path, link),
+    AddConnectionNode.isType: (String path) => new AddConnectionNode(path, link),
   }, defaultNodes: {
-    AddConnection.pathName: AddConnection.definition()
+    AddConnectionNode.pathName: AddConnectionNode.definition()
   });
 
   link.init();

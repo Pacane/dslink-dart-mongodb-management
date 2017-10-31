@@ -14,7 +14,7 @@ main() {
   Map<String, String> validParams;
 
   setUp(() {
-    node = new AddConnection('path', link);
+    node = new AddConnectionNode('path', link);
 
     validParams = {
       AddConnectionParams.name: 'connection name',

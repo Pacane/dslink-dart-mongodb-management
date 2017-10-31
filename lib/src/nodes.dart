@@ -39,7 +39,7 @@ class AddConnectionParams {
   }
 }
 
-class AddConnection extends SimpleNode {
+class AddConnectionNode extends SimpleNode {
   static const String isType = 'addConnectionAction';
   static const String pathName = 'Add_Connection';
 
@@ -73,7 +73,7 @@ class AddConnection extends SimpleNode {
 
   LinkProvider _link;
 
-  AddConnection(String path, this._link) : super(path);
+  AddConnectionNode(String path, this._link) : super(path);
 
   @override
   Future<Null> onInvoke(Map<String, dynamic> params) async {
