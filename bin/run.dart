@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:dslink/dslink.dart';
-import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
+import 'package:dslink_dslink_mongodb_management/nodes.dart';
 
 Future<Null> main(List<String> args) async {
   LinkProvider link;
