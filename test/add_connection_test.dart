@@ -9,9 +9,9 @@ import 'mocks.dart';
 
 void main() {
   final link = new LinkMock();
-  final provider = new ProviderMock();
-  final mongoClient = new MongoClientMock();
-  final mongoClientFactory = new MongoClientFactoryMock();
+  SimpleNodeProvider provider;
+  MongoClient mongoClient;
+  MongoClientFactory mongoClientFactory;
 
   final connectionName = 'connection name';
   final address = 'mongo://something/db';
@@ -22,6 +22,10 @@ void main() {
   Map<String, String> validParams;
 
   setUp(() {
+    provider = new ProviderMock();
+    mongoClient = new MongoClientMock();
+    mongoClientFactory = new MongoClientFactoryMock();
+
     node = new AddConnectionNode.withCustomProvider(
         'path', link, mongoClientFactory, provider);
 
@@ -89,6 +93,22 @@ void main() {
 
       expect(() => node.onInvoke(validParams),
           throwsA(AddConnectionNode.connectionAlreadyExistErrorMsg));
+    });
+
+    test('throws an error when credentials are wrong', () {
+      when(mongoClient.testConnection())
+          .thenReturn(new Future.value(AuthResult.authError));
+
+      expect(() => node.onInvoke(validParams),
+          throwsA(AddConnectionNode.wrongCredentialsErrorMsg));
+    });
+
+    test('throws an error when database is unreachable', () {
+      when(mongoClient.testConnection())
+          .thenReturn(new Future.value(AuthResult.notFound));
+
+      expect(() => node.onInvoke(validParams),
+          throwsA(AddConnectionNode.notFoundErrorMsg));
     });
   });
 }
