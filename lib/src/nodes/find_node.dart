@@ -44,7 +44,9 @@ class FindNode extends SimpleNode {
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
 
-    await client.find(collectionName, code, limit, skip);
+    final result = await client.find(collectionName, code, limit, skip);
+
+    return result;
   }
 
   static Map<String, dynamic> definition() => {

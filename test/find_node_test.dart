@@ -54,5 +54,17 @@ Future main() {
 
       verify(client.find(collectionName, code, limit, skip));
     });
+
+    test("returns find's result", () async {
+      final expectedResult = [
+        {'result': true}
+      ];
+      when(client.find(collectionName, code, limit, skip))
+          .thenReturn(expectedResult);
+
+      final actual = await node.onInvoke(validParams);
+
+      expect(actual, expectedResult);
+    });
   });
 }
