@@ -48,8 +48,8 @@ class MongoClient {
     return db.getCollectionNames();
   }
 
-  dynamic find(String collectionName, Map<String, dynamic> code, int limit,
-      int skip) async {
+  Future<List<Map<String, dynamic>>> find(String collectionName,
+      Map<String, dynamic> code, int limit, int skip) async {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 

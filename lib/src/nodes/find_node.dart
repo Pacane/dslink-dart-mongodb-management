@@ -54,7 +54,9 @@ class FindNode extends SimpleNode {
 
     final result = await client.find(collectionName, code, limit, skip);
 
-    return result;
+    final resultAsJsonString = JSON.encode(result);
+
+    return resultAsJsonString;
   }
 
   static Map<String, dynamic> definition() => {

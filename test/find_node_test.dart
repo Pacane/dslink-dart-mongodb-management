@@ -62,16 +62,17 @@ void main() {
       verify(client.find(collectionName, JSON.decode(code), limit, skip));
     });
 
-    test("returns find's result", () async {
-      final expectedResult = [
+    test("returns a JSON encoded version of find's result", () async {
+      final findResult = [
         {'result': true}
       ];
+      final expected = JSON.encode(findResult);
       when(client.find(collectionName, JSON.decode(code), limit, skip))
-          .thenReturn(expectedResult);
+          .thenReturn(findResult);
 
       final actual = await node.onInvoke(validParams);
 
-      expect(actual, expectedResult);
+      expect(actual, expected);
     });
   });
 }
