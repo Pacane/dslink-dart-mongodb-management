@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dslink/dslink.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:dslink_dslink_mongodb_management/utils.dart';
@@ -7,9 +8,10 @@ class FindNodeParams {
   static const String limit = 'limit';
   static const String skip = 'skip';
 
-  static const String invalidCodeErrorMsg = 'Invalid code.';
   static const String invalidLimitErrorMsg = 'Invalid limit.';
   static const String invalidSkipErrorMsg = 'Invalid skip.';
+  static const String invalidCodeErrorMsg =
+      'Cannot parse query code properly. It should be valid JSON.';
 
   static void validateParams(Map<String, String> params) {
     if (isNullOrEmpty(params[code])) {
@@ -22,6 +24,12 @@ class FindNodeParams {
 
     if (params[skip] == null) {
       throw invalidSkipErrorMsg;
+    }
+
+    try {
+      JSON.decode(params[code]);
+    } on FormatException catch (_) {
+      throw invalidCodeErrorMsg;
     }
   }
 }
@@ -40,7 +48,7 @@ class FindNode extends SimpleNode {
   dynamic onInvoke(Map<String, dynamic> params) async {
     FindNodeParams.validateParams(params);
 
-    final code = params[FindNodeParams.code];
+    final code = JSON.decode(params[FindNodeParams.code]);
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
 

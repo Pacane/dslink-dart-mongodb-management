@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:test/test.dart';
@@ -50,13 +49,14 @@ void main() {
   });
 
   group('find', () {
+    final client = new MongoClient(uri, username, password);
+    final limit = 0, skip = 0;
+
     group('simple data', () {
       final collectionName = 'simple_data';
-      final client = new MongoClient(uri, username, password);
 
       test('all', () async {
-        final code = '{}';
-        final limit = 0, skip = 0;
+        final code = {};
         final result = await client.find(collectionName, code, limit, skip);
 
         expect(result, hasLength(3));
@@ -66,8 +66,9 @@ void main() {
       });
 
       test('regex', () async {
-        final code = r'{"name": {"$regex": "mat.*", "$options": "i"}}';
-        final limit = 0, skip = 0;
+        final code = {
+          "name": {"\$regex": "mat.*", "\$options": "i"}
+        };
         final result = await client.find(collectionName, code, limit, skip);
 
         expect(result, hasLength(1));

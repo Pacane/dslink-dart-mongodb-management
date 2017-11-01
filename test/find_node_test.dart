@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:mockito/mockito.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:dslink_dslink_mongodb_management/nodes.dart';
@@ -6,7 +7,7 @@ import 'package:dslink_dslink_mongodb_management/utils.dart';
 import 'package:test/test.dart';
 import 'mocks.dart';
 
-Future main() {
+void main() {
   Map<String, dynamic> validParams;
 
   final code = '{}';
@@ -38,6 +39,13 @@ Future main() {
     }
   });
 
+  test('query code must be valid JSON', () {
+    validParams[FindNodeParams.code] = '{missing: quotes}';
+
+    expect(() => FindNodeParams.validateParams(validParams),
+        throwsA(FindNodeParams.invalidCodeErrorMsg));
+  });
+
   group('onInvoke', () {
     final path = '/somePath';
     final collectionName = 'some name';
@@ -52,14 +60,14 @@ Future main() {
     test('delegates to MongoClient', () async {
       await node.onInvoke(validParams);
 
-      verify(client.find(collectionName, code, limit, skip));
+      verify(client.find(collectionName, JSON.decode(code), limit, skip));
     });
 
     test("returns find's result", () async {
       final expectedResult = [
         {'result': true}
       ];
-      when(client.find(collectionName, code, limit, skip))
+      when(client.find(collectionName, JSON.decode(code), limit, skip))
           .thenReturn(expectedResult);
 
       final actual = await node.onInvoke(validParams);

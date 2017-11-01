@@ -49,12 +49,14 @@ class MongoClient {
     return db.getCollectionNames();
   }
 
-  dynamic find(String collectionName, String code, int limit, int skip) async {
+  dynamic find(String collectionName, Map<String, dynamic> code, int limit,
+      int skip) async {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
     final sb = new SelectorBuilder();
-    sb.raw(JSON.decode(code));
+    sb.raw(code);
+
     final c = new Cursor(db, collection, sb);
 
     try {
