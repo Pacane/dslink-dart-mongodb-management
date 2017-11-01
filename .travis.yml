@@ -1,8 +1,8 @@
 language: dart
 dart_task:
-- test: "--platform vm"
 - dartfmt
 - dartanalyzer: "--fatal-warnings lib"
+- test: "--platform vm"
 env:
   global:
   - secure: XM5R2KQIEwATZcloXpeL3CDoOGZJgOsCYZ/kNDBHd1/GiVkh9Q8hoADK9vLZ+zo5vYIt8xVD5FngX+l6AyiqC39UH7sWRtBXbQgShCCS5sTGePNhF+0ii9m+RHY41Zr+5ZslcZwu1BmvoU5dNA8N/vV4unncB3D0ImUVrzLrM1QqITUoQhSbVd7sKf2AM6N5Qu4WN15btWkMJ3TYpmfJ7la7xInirQIEVzTApsJOSWhDDyz6WsI4IKn2osxVJyhWKVXk9zxgv81CbaICnFTyP67+0OHdtV3tWOlgX6dfvcV6E8NYxzloSbc8P/DnT79Po7gYpT7hY8CP0n8TA33qkZpdhQYc3lj4ZeauPQ8RRdpuS+bHV7pdwdAFqJI7YIDDbGxY0k/bGcB/GTlPt/74OJ2qzMPpSMJlRgwiO+R6pnSyOvF9KrIyDQbqkjDy5o9S7BghV2m0zY0NYdrJ6T2WkwegsEoMdhmExfHYAD9lr35okCchJdOvR6EiLAmvj9lVn7c2UYT8jdtT0verV+ZD3hNkiVKVPqjrpT7azYaTGOGoztgAl4bsCwsHMS57lUP9Fr4oMaLFEqM+BRPEmiQqd0TzU5FC0GJ2oKyc9YjfXxCcjO4STgItO/TeVM8nk9+4wPviHJHhV2g3i3j0FcnE/tQrH7M0Z7SdGF/IrHq6P0M=
