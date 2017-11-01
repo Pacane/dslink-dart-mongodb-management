@@ -69,7 +69,8 @@ class MongoClient {
     }
   }
 
-  Stream<Map<String, dynamic>> findStreaming(String collectionName, code, limit, skip) async* {
+  Stream<Map<String, dynamic>> findStreaming(String collectionName,
+      Map<String, dynamic> code, int limit, int skip) async* {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
@@ -82,7 +83,7 @@ class MongoClient {
       c.limit = limit;
       c.skip = skip;
       await for (var row in c.stream) {
-       yield row;
+        yield row;
       }
     } catch (e) {
       rethrow;

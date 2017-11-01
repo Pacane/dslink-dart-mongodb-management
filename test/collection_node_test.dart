@@ -21,11 +21,18 @@ void main() {
   });
 
   group('adding actions onCreated', () {
-    test('query node', () {
+    test('find node', () {
       node.onCreated();
 
       verify(provider.setNode('$path/${FindNode.pathName}',
           argThat(const isInstanceOf<FindNode>())));
+    });
+
+    test('find stream node', () {
+      node.onCreated();
+
+      verify(provider.setNode('$path/${FindStreamNode.pathName}',
+          argThat(const isInstanceOf<FindStreamNode>())));
     });
   });
 }

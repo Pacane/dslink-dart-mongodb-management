@@ -60,12 +60,14 @@ class FindStreamNode extends SimpleNode {
     final rows = client.findStreaming(collectionName, code, limit, skip);
     await for (var row in rows) {
       final encodedRow = JSON.encode(row);
-      yield [encodedRow];
+      yield [
+        [encodedRow]
+      ];
     }
   }
 
   static Map<String, dynamic> definition() => {
-        r"$name": "Evaluate Raw Query",
+        r"$name": "Streaming Find",
         r"$is": isType,
         r"$result": "stream",
         r"$invokable": "read",

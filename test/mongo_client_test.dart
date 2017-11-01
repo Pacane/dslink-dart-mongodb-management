@@ -71,6 +71,15 @@ void main() {
         expect(result, hasLength(1));
         expect(result[0]['name'], 'matt');
       });
+
+      test("limit is respected", () async {
+        final limit = 2;
+        final code = {};
+
+        var result = await client.find(collectionName, code, limit, skip);
+
+        expect(result, hasLength(limit));
+      });
     });
   });
 
@@ -89,13 +98,25 @@ void main() {
 
         validateAllSimpleData(result);
       });
+
+      test("limit is respected", () async {
+        final limit = 2;
+        final code = {};
+
+        var result = await client
+            .findStreaming(collectionName, code, limit, skip)
+            .toList();
+
+        expect(result, hasLength(limit));
+      });
     });
   });
 }
 
 void validateAllSimpleData(List<Map<String, dynamic>> result) {
-  expect(result, hasLength(3));
+  expect(result, hasLength(9));
   expect(result[0]['name'], 'joel');
   expect(result[1]['name'], 'matt');
   expect(result[2]['name'], 'martine');
+  // more data
 }

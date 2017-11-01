@@ -1,7 +1,7 @@
 import 'package:dslink/dslink.dart';
 import 'package:dslink/nodes.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
-import 'find_node.dart';
+import 'package:dslink_dslink_mongodb_management/nodes.dart';
 
 class CollectionNode extends SimpleNode {
   static const String isType = 'collectionNode';
@@ -31,8 +31,12 @@ class CollectionNode extends SimpleNode {
 
   @override
   void onCreated() {
-    final queryNode =
+    final findNode =
         new FindNode('$path/${FindNode.pathName}', client, collectionName);
-    provider.setNode(queryNode.path, queryNode);
+    provider.setNode(findNode.path, findNode);
+
+    final findStreamNode = new FindStreamNode(
+        '$path/${FindStreamNode.pathName}', client, collectionName);
+    provider.setNode(findStreamNode.path, findStreamNode);
   }
 }
