@@ -46,7 +46,6 @@ class TesterNode extends SimpleNode {
         r'$columns': []
       };
 
-
   @override
   Future<Map<String, dynamic>> onInvoke(Map<String, dynamic> params) async {
     throw new Exception("That's broken");

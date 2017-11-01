@@ -12,8 +12,8 @@ class CollectionNode extends SimpleNode {
   CollectionNode(String path, this.client, this.collectionName) : super(path);
 
   /// For testing purpose only
-  CollectionNode.withCustomProvider(
-      String path, this.client, this.collectionName, SimpleNodeProvider provider)
+  CollectionNode.withCustomProvider(String path, this.client,
+      this.collectionName, SimpleNodeProvider provider)
       : super(path, provider);
 
   static Map<String, dynamic> definition(String collectionName) => {
