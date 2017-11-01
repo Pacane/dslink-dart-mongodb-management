@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dslink/dslink.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
@@ -45,7 +46,7 @@ class FindNode extends SimpleNode {
   static const String isType = 'queryNode';
 
   @override
-  dynamic onInvoke(Map<String, dynamic> params) async {
+  Future<Map<String, String>> onInvoke(Map<String, dynamic> params) async {
     FindNodeParams.validateParams(params);
 
     final code = JSON.decode(params[FindNodeParams.code]);
@@ -56,7 +57,7 @@ class FindNode extends SimpleNode {
 
     final resultAsJsonString = JSON.encode(result);
 
-    return resultAsJsonString;
+    return {'result': resultAsJsonString};
   }
 
   static Map<String, dynamic> definition() => {
@@ -86,7 +87,7 @@ class FindNode extends SimpleNode {
           },
         ],
         r'$columns': [
-          {"name": "json", "type": "string"}
+          {"name": "result", "type": "string"}
         ],
       };
 }

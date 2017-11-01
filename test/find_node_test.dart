@@ -22,14 +22,14 @@ void main() {
   });
 
   group('Null parameters validation', () {
-    final testCases = [
+    final testCases = <Tuple>[
       const Tuple(FindNodeParams.code, FindNodeParams.invalidCodeErrorMsg),
       const Tuple(FindNodeParams.limit, FindNodeParams.invalidLimitErrorMsg),
       const Tuple(FindNodeParams.skip, FindNodeParams.invalidSkipErrorMsg),
     ];
 
     for (var testCase in testCases) {
-      test('Throws when $testCase is null', () {
+      test('Throws when ${testCase.first} is null', () {
         expect(
             () => FindNodeParams
                 .validateParams(validParams..remove(testCase.first)),
@@ -66,7 +66,7 @@ void main() {
       final findResult = [
         {'result': true}
       ];
-      final expected = JSON.encode(findResult);
+      final expected = {'result': JSON.encode(findResult)};
       when(client.find(collectionName, JSON.decode(code), limit, skip))
           .thenReturn(findResult);
 
