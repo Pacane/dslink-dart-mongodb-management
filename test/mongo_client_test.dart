@@ -59,10 +59,7 @@ void main() {
         final code = {};
         final result = await client.find(collectionName, code, limit, skip);
 
-        expect(result, hasLength(3));
-        expect(result[0]['name'], 'joel');
-        expect(result[1]['name'], 'matt');
-        expect(result[2]['name'], 'martine');
+        validateAllSimpleData(result);
       });
 
       test('regex', () async {
@@ -76,4 +73,29 @@ void main() {
       });
     });
   });
+
+  group('findStream', () {
+    final client = new MongoClient(uri, username, password);
+    final limit = 0, skip = 0;
+
+    group('simple data', () {
+      final collectionName = 'simple_data';
+      test('all', () async {
+        final code = {};
+
+        final result = await client
+            .findStreaming(collectionName, code, limit, skip)
+            .toList();
+
+        validateAllSimpleData(result);
+      });
+    });
+  });
+}
+
+void validateAllSimpleData(List<Map<String, dynamic>> result) {
+  expect(result, hasLength(3));
+  expect(result[0]['name'], 'joel');
+  expect(result[1]['name'], 'matt');
+  expect(result[2]['name'], 'martine');
 }

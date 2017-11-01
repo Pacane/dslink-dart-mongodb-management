@@ -4,13 +4,20 @@ import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:dslink_dslink_mongodb_management/nodes.dart';
 
 class DatabaseNode extends SimpleNode {
+  static String isType = 'databaseNode';
+
   final LinkProvider link;
+  MongoClientFactory mongoClientFactory;
+  MongoClient client;
 
   DatabaseNode(String path, String address, String username, String password,
       String connectionName, this.client, this.link)
       : super(path) {
     load(definition(address, username, password, connectionName));
   }
+
+  DatabaseNode.restore(String path, this.link, this.mongoClientFactory)
+      : super(path);
 
   /// Used for testing only
   DatabaseNode.withCustomProvider(
@@ -26,8 +33,6 @@ class DatabaseNode extends SimpleNode {
     load(definition(address, username, password, connectionName));
   }
 
-  static String isType = 'databaseNode';
-
   static Map<String, dynamic> definition(String address, String username,
           String password, String connectionName) =>
       {
@@ -35,17 +40,19 @@ class DatabaseNode extends SimpleNode {
         r'$name': connectionName,
         _address: address,
         _user: username,
-        _pass: password,
+        _pass: password
       };
 
   static const String _user = r'$$username';
   static const String _pass = r'$$password';
   static const String _address = r'$$uri';
 
-  final MongoClient client;
-
   @override
   Future<Null> onCreated() async {
+    if (client == null) {
+      client = restoreClientFromConfigs();
+    }
+
     await refreshCollections();
 
     final refreshCollectionsNodePath =
@@ -63,5 +70,13 @@ class DatabaseNode extends SimpleNode {
           new CollectionNode('$path/$collectionName', client, collectionName);
       provider.setNode(collectionNode.path, collectionNode);
     }
+  }
+
+  MongoClient restoreClientFromConfigs() {
+    var address = configs[_address];
+    var username = configs[_user];
+    var password = configs[_pass];
+
+    return mongoClientFactory.create(Uri.parse(address), username, password);
   }
 }

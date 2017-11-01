@@ -43,6 +43,17 @@ class AddConnectionParams {
 }
 
 class AddConnectionNode extends SimpleNode {
+  static const String connectionAlreadyExistErrorMsg =
+      "There's already a connection with that name that exists.";
+  static const String wrongCredentialsErrorMsg =
+      'Unable to authenticate with provided credentials';
+  static const String notFoundErrorMsg = 'Unable to reach the database';
+  static const String isType = 'addConnectionAction';
+  static const String pathName = 'Add_Connection';
+
+  final LinkProvider link;
+  final MongoClientFactory mongoClientFactory;
+
   AddConnectionNode(String path, this.link, this.mongoClientFactory)
       : super(path);
 
@@ -51,13 +62,7 @@ class AddConnectionNode extends SimpleNode {
       this.mongoClientFactory, SimpleNodeProvider provider)
       : super(path, provider);
 
-  static const String connectionAlreadyExistErrorMsg =
-      "There's already a connection with that name that exists.";
-  static const String wrongCredentialsErrorMsg =
-      'Unable to authenticate with provided credentials';
-  static const String notFoundErrorMsg = 'Unable to reach the database';
-  static const String isType = 'addConnectionAction';
-  static const String pathName = 'Add_Connection';
+  bool get serializable  => false;
 
   static Map<String, dynamic> definition() => {
         r'$is': isType,
@@ -86,9 +91,6 @@ class AddConnectionNode extends SimpleNode {
           },
         ],
       };
-
-  final LinkProvider link;
-  final MongoClientFactory mongoClientFactory;
 
   @override
   Future<Null> onInvoke(Map<String, dynamic> params) async {

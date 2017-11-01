@@ -10,6 +10,8 @@ Future<Null> main(List<String> args) async {
   link = new LinkProvider(args, "MongoDB-", autoInitialize: false, profiles: {
     AddConnectionNode.isType: (path) =>
         new AddConnectionNode(path, link, mongoClientFactory),
+    DatabaseNode.isType: (path) =>
+        new DatabaseNode.restore(path, link, mongoClientFactory)
   }, defaultNodes: {
     AddConnectionNode.pathName: AddConnectionNode.definition()
   });

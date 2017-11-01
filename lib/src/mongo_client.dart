@@ -68,6 +68,26 @@ class MongoClient {
       rethrow;
     }
   }
+
+  Stream<Map<String, dynamic>> findStreaming(String collectionName, code, limit, skip) async* {
+    final db = await connectionPool.connect();
+    final collection = db.collection(collectionName);
+
+    final sb = new SelectorBuilder();
+    sb.raw(code);
+
+    final c = new Cursor(db, collection, sb);
+
+    try {
+      c.limit = limit;
+      c.skip = skip;
+      await for (var row in c.stream) {
+       yield row;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
 
 enum AuthResult { ok, authError, notFound, other }

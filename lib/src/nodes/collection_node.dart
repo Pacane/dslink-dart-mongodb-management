@@ -9,6 +9,9 @@ class CollectionNode extends SimpleNode {
   final MongoClient client;
   final String collectionName;
 
+  @override
+  bool get serializable => false;
+
   CollectionNode(String path, this.client, this.collectionName) : super(path) {
     load(definition(collectionName));
   }

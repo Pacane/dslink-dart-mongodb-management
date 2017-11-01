@@ -14,6 +14,9 @@ class RefreshCollectionsNode extends SimpleNode {
   }
 
   @override
+  bool get serializable => false;
+
+  @override
   Future<Null> onInvoke(Map<String, dynamic> params) async {
     await (parent as DatabaseNode).refreshCollections();
   }
