@@ -62,8 +62,6 @@ class AddConnectionNode extends SimpleNode {
       this.mongoClientFactory, SimpleNodeProvider provider)
       : super(path, provider);
 
-  bool get serializable  => false;
-
   static Map<String, dynamic> definition() => {
         r'$is': isType,
         r'$name': 'Add Connection',
