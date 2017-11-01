@@ -14,7 +14,7 @@ class DatabaseNode extends SimpleNode {
   static String isType = 'databaseNode';
 
   static Map<String, dynamic> definition(String address, String username,
-      String password, String connectionName) =>
+          String password, String connectionName) =>
       {
         r'$is': isType,
         r'$name': connectionName,
@@ -34,10 +34,9 @@ class DatabaseNode extends SimpleNode {
     final collections = await client.listCollections();
     for (final collectionName in collections) {
       final collectionNode =
-      new CollectionNode('$path/$collectionName', client);
+          new CollectionNode('$path/$collectionName', client, collectionName);
       collectionNode.load(CollectionNode.definition(collectionName));
       provider.setNode(collectionNode.path, collectionNode);
     }
   }
 }
-

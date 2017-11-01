@@ -3,8 +3,7 @@ import 'package:dslink/dslink.dart';
 import 'package:dslink/nodes.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'database_node.dart';
-
-bool isNullOrEmpty(String s) => s == null || s.isEmpty;
+import 'package:dslink_dslink_mongodb_management/utils.dart';
 
 class AddConnectionParams {
   static const String name = 'connectionName';
@@ -54,6 +53,9 @@ class AddConnectionNode extends SimpleNode {
 
   static const String connectionAlreadyExistErrorMsg =
       "There's already a connection with that name that exists.";
+  static const String wrongCredentialsErrorMsg =
+      'Unable to authenticate with provided credentials';
+  static const String notFoundErrorMsg = 'Unable to reach the database';
   static const String isType = 'addConnectionAction';
   static const String pathName = 'Add_Connection';
 
@@ -115,10 +117,10 @@ class AddConnectionNode extends SimpleNode {
         _link.save();
         return;
       case AuthResult.notFound:
-        throw 'Unable to reach the database';
+        throw notFoundErrorMsg;
         break;
       case AuthResult.authError:
-        throw 'Unable to authenticate with provided credentials';
+        throw wrongCredentialsErrorMsg;
         break;
       case AuthResult.other:
       default:

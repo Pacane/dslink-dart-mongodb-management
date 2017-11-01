@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 import 'package:mongo_dart/mongo_dart.dart';
@@ -46,6 +47,27 @@ class MongoClient {
   Future<List<String>> listCollections() async {
     final db = await connectionPool.connect();
     return db.getCollectionNames();
+  }
+
+  dynamic find(String collectionName, Map<String, dynamic> code, int limit,
+      int skip) async {
+    final db = await connectionPool.connect();
+    final collection = db.collection(collectionName);
+
+    final sb = new SelectorBuilder();
+    sb.raw(code);
+
+    final c = new Cursor(db, collection, sb);
+
+    try {
+      c.limit = limit;
+      c.skip = skip;
+      final result = await c.stream.toList();
+
+      return result;
+    } catch (e) {
+      rethrow;
+    }
   }
 }
 
