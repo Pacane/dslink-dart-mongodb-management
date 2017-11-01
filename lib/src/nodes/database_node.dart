@@ -1,17 +1,30 @@
 import 'dart:async';
 import 'package:dslink/dslink.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
-import 'collection_node.dart';
+import 'package:dslink_dslink_mongodb_management/nodes.dart';
 
 class DatabaseNode extends SimpleNode {
   final LinkProvider link;
 
-  DatabaseNode(String path, this.client, this.link) : super(path);
+  DatabaseNode(String path, String address, String username, String password,
+      String connectionName, this.client, this.link)
+      : super(path) {
+    load(definition(address, username, password, connectionName));
+  }
 
   /// Used for testing only
   DatabaseNode.withCustomProvider(
-      String path, this.client, this.link, SimpleNodeProvider provider)
-      : super(path, provider);
+      String path,
+      String address,
+      String username,
+      String password,
+      String connectionName,
+      this.client,
+      this.link,
+      SimpleNodeProvider provider)
+      : super(path, provider) {
+    load(definition(address, username, password, connectionName));
+  }
 
   static String isType = 'databaseNode';
 
@@ -33,13 +46,22 @@ class DatabaseNode extends SimpleNode {
 
   @override
   Future<Null> onCreated() async {
+    await refreshCollections();
+
+    final refreshCollectionsNodePath =
+        '$path/${RefreshCollectionsNode.pathName}';
+    provider.setNode(refreshCollectionsNodePath,
+        new RefreshCollectionsNode(refreshCollectionsNodePath, client));
+
+    link.save();
+  }
+
+  Future refreshCollections() async {
     final collections = await client.listCollections();
     for (final collectionName in collections) {
       final collectionNode =
           new CollectionNode('$path/$collectionName', client, collectionName);
-      collectionNode.load(CollectionNode.definition(collectionName));
       provider.setNode(collectionNode.path, collectionNode);
     }
-    link.save();
   }
 }

@@ -9,12 +9,16 @@ class CollectionNode extends SimpleNode {
   final MongoClient client;
   final String collectionName;
 
-  CollectionNode(String path, this.client, this.collectionName) : super(path);
+  CollectionNode(String path, this.client, this.collectionName) : super(path) {
+    load(definition(collectionName));
+  }
 
   /// For testing purpose only
   CollectionNode.withCustomProvider(String path, this.client,
       this.collectionName, SimpleNodeProvider provider)
-      : super(path, provider);
+      : super(path, provider) {
+    load(definition(collectionName));
+  }
 
   static Map<String, dynamic> definition(String collectionName) => {
         r'$is': isType,
@@ -26,7 +30,6 @@ class CollectionNode extends SimpleNode {
   void onCreated() {
     final queryNode =
         new FindNode('$path/${FindNode.pathName}', client, collectionName);
-    queryNode.load(FindNode.definition());
     provider.setNode(queryNode.path, queryNode);
   }
 }

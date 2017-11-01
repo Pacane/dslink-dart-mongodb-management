@@ -111,8 +111,8 @@ class AddConnectionNode extends SimpleNode {
 
     switch (res) {
       case AuthResult.ok:
-        final dbNode = new DatabaseNode('/$name', cl, link);
-        dbNode.load(DatabaseNode.definition(address, username, password, name));
+        final dbNode = new DatabaseNode(
+            '/$name', address, username, password, name, cl, link);
         provider.setNode('/$name', dbNode);
         link.save();
         return;

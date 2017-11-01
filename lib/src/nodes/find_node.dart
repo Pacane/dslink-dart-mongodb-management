@@ -41,7 +41,9 @@ class FindNode extends SimpleNode {
   final MongoClient client;
   final String collectionName;
 
-  FindNode(String path, this.client, this.collectionName) : super(path);
+  FindNode(String path, this.client, this.collectionName) : super(path) {
+    load(definition());
+  }
 
   static const String isType = 'queryNode';
 

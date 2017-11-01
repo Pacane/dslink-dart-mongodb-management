@@ -8,6 +8,10 @@ import 'mocks.dart';
 
 void main() {
   final path = '/pathName';
+  final address = 'address';
+  final username = 'username';
+  final password = 'password';
+  final connectionName = 'name';
   SimpleNodeProvider provider;
   MongoClient mongoClient;
   LinkProvider link;
@@ -18,34 +22,55 @@ void main() {
     mongoClient = new MongoClientMock();
     provider = new ProviderMock();
     link = new LinkProviderMock();
-    dbNode =
-        new DatabaseNode.withCustomProvider(path, mongoClient, link, provider);
+    dbNode = new DatabaseNode.withCustomProvider(path, address, username,
+        password, connectionName, mongoClient, link, provider);
   });
 
-  test('create collections nodes', () async {
+  group('onCreated', () {
     final collections = ['collection1', 'collection2'];
-    when(mongoClient.listCollections())
-        .thenReturn(new Future.value(collections));
 
-    await dbNode.onCreated();
+    setUp(() {
+      when(mongoClient.listCollections())
+          .thenReturn(new Future.value(collections));
+    });
 
-    for (final collection in collections) {
-      final collectionNodePath = '$path/$collection';
+    test('create collections nodes', () async {
+      final collections = ['collection1', 'collection2'];
+      when(mongoClient.listCollections())
+          .thenReturn(new Future.value(collections));
+
+      await dbNode.onCreated();
+
+      for (final collection in collections) {
+        final collectionNodePath = '$path/$collection';
+        verify(provider.setNode(
+            collectionNodePath, argThat(const isInstanceOf<CollectionNode>())));
+      }
+    });
+
+    test('link saves after adding the collections', () async {
+      await dbNode.onCreated();
+
+      verifyInOrder(collections
+          .map((collectionName) => provider.setNode(
+              any, argThat(const isInstanceOf<CollectionNode>())))
+          .toList());
+      verify(link.save());
+    });
+
+    test('adds refresh collections action', () async {
+      await dbNode.onCreated();
+
+      verify(provider.setNode('$path/${RefreshCollectionsNode.pathName}',
+          argThat(const isInstanceOf<RefreshCollectionsNode>())));
+    });
+
+    test('link saves after adding refresh collections action', () async {
+      await dbNode.onCreated();
+
       verify(provider.setNode(
-          collectionNodePath, argThat(const isInstanceOf<CollectionNode>())));
-    }
-  });
-
-  test('link saves after adding the collections', () async {
-    final collections = ['collection1', 'collection2'];
-    when(mongoClient.listCollections())
-        .thenReturn(new Future.value(collections));
-
-    await dbNode.onCreated();
-
-    verifyInOrder(collections
-        .map((collectionName) => provider.setNode(any, any))
-        .toList());
-    verify(link.save());
+          any, argThat(const isInstanceOf<RefreshCollectionsNode>())));
+      verify(link.save());
+    });
   });
 }
