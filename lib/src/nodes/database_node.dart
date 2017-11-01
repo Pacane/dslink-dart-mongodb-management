@@ -4,11 +4,13 @@ import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'collection_node.dart';
 
 class DatabaseNode extends SimpleNode {
-  DatabaseNode(String path, this.client) : super(path);
+  final LinkProvider link;
+
+  DatabaseNode(String path, this.client, this.link) : super(path);
 
   /// Used for testing only
   DatabaseNode.withCustomProvider(
-      String path, this.client, SimpleNodeProvider provider)
+      String path, this.client, this.link, SimpleNodeProvider provider)
       : super(path, provider);
 
   static String isType = 'databaseNode';
@@ -38,5 +40,6 @@ class DatabaseNode extends SimpleNode {
       collectionNode.load(CollectionNode.definition(collectionName));
       provider.setNode(collectionNode.path, collectionNode);
     }
+    link.save();
   }
 }

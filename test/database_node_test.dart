@@ -10,13 +10,16 @@ void main() {
   final path = '/pathName';
   SimpleNodeProvider provider;
   MongoClient mongoClient;
+  LinkProvider link;
 
   DatabaseNode dbNode;
 
   setUp(() {
     mongoClient = new MongoClientMock();
     provider = new ProviderMock();
-    dbNode = new DatabaseNode.withCustomProvider(path, mongoClient, provider);
+    link = new LinkProviderMock();
+    dbNode =
+        new DatabaseNode.withCustomProvider(path, mongoClient, link, provider);
   });
 
   test('create collections nodes', () async {
@@ -28,10 +31,21 @@ void main() {
 
     for (final collection in collections) {
       final collectionNodePath = '$path/$collection';
-      final child = verify(provider.setNode(collectionNodePath, captureAny))
-          .captured
-          .first;
-      expect(child, const isInstanceOf<CollectionNode>());
+      verify(provider.setNode(
+          collectionNodePath, argThat(const isInstanceOf<CollectionNode>())));
     }
+  });
+
+  test('link saves after adding the collections', () async {
+    final collections = ['collection1', 'collection2'];
+    when(mongoClient.listCollections())
+        .thenReturn(new Future.value(collections));
+
+    await dbNode.onCreated();
+
+    verifyInOrder(collections
+        .map((collectionName) => provider.setNode(any, any))
+        .toList());
+    verify(link.save());
   });
 }

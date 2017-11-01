@@ -43,11 +43,11 @@ class AddConnectionParams {
 }
 
 class AddConnectionNode extends SimpleNode {
-  AddConnectionNode(String path, this._link, this.mongoClientFactory)
+  AddConnectionNode(String path, this.link, this.mongoClientFactory)
       : super(path);
 
   /// Used for testing only
-  AddConnectionNode.withCustomProvider(String path, this._link,
+  AddConnectionNode.withCustomProvider(String path, this.link,
       this.mongoClientFactory, SimpleNodeProvider provider)
       : super(path, provider);
 
@@ -87,7 +87,7 @@ class AddConnectionNode extends SimpleNode {
         ],
       };
 
-  LinkProvider _link;
+  final LinkProvider link;
   final MongoClientFactory mongoClientFactory;
 
   @override
@@ -111,10 +111,10 @@ class AddConnectionNode extends SimpleNode {
 
     switch (res) {
       case AuthResult.ok:
-        final dbNode = new DatabaseNode('/$name', cl);
+        final dbNode = new DatabaseNode('/$name', cl, link);
         dbNode.load(DatabaseNode.definition(address, username, password, name));
         provider.setNode('/$name', dbNode);
-        _link.save();
+        link.save();
         return;
       case AuthResult.notFound:
         throw notFoundErrorMsg;

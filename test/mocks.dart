@@ -10,3 +10,5 @@ class MongoClientFactoryMock extends Mock implements MongoClientFactory {}
 
 // ignore: strong_mode_invalid_method_override_from_base
 class ProviderMock extends Mock implements SimpleNodeProvider {}
+
+class LinkProviderMock extends Mock implements LinkProvider {}

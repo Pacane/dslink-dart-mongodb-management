@@ -80,11 +80,8 @@ void main() {
 
       await node.onInvoke(validParams);
 
-      final childQueryNode =
-          verify(provider.setNode(expectedDbNodePath, captureAny))
-              .captured
-              .first;
-      expect(childQueryNode, const isInstanceOf<DatabaseNode>());
+      verify(provider.setNode(
+          expectedDbNodePath, argThat(const isInstanceOf<DatabaseNode>())));
     });
 
     test('throws an error when a connection with that name already exists',

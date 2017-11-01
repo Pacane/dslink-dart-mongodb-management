@@ -24,11 +24,8 @@ void main() {
     test('query node', () {
       node.onCreated();
 
-      final queryNode =
-          verify(provider.setNode('$path/${FindNode.pathName}', captureAny))
-              .captured
-              .first;
-      expect(queryNode, const isInstanceOf<FindNode>());
+      verify(provider.setNode('$path/${FindNode.pathName}',
+          argThat(const isInstanceOf<FindNode>())));
     });
   });
 }
