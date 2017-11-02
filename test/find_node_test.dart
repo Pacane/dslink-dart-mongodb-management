@@ -31,7 +31,7 @@ void main() {
     ];
 
     for (var testCase in testCases) {
-      test('Throws when ${testCase.first} is null', () {
+      test('throws when ${testCase.first} is null', () {
         expect(
             () => FindNodeParams
                 .validateParams(validParams..remove(testCase.first)),
