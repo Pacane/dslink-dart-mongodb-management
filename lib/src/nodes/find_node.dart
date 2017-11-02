@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:dslink/dslink.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:dslink_dslink_mongodb_management/utils.dart';
@@ -47,7 +48,7 @@ class FindNode extends SimpleNode {
   }
 
   @override
-  bool get serializable  => false;
+  bool get serializable => false;
 
   @override
   Future<Map<String, String>> onInvoke(Map<String, dynamic> params) async {
