@@ -90,6 +90,18 @@ void main() {
 
         expect(result[0]['name'], 'martine');
       });
+
+      test("orderby is supported", () async {
+        final code = {
+          r'$query': {},
+          r'$orderby': {'name': 1}
+        };
+
+        var result = await client.find(collectionName, code, limit, skip);
+
+        var expected = copyAndSortResultsBy(result, 'name');
+        expect(result, containsAllInOrder(expected));
+      });
     });
   });
 
@@ -132,6 +144,13 @@ void main() {
       });
     });
   });
+}
+
+copyAndSortResultsBy(List<Map<String, dynamic>> result, dynamic valueToSortBy) {
+  final expected = new List.from(result)
+    ..sort((Map<String, dynamic> first, Map<String, dynamic> second) =>
+        first[valueToSortBy].compareTo(second[valueToSortBy]));
+  return expected;
 }
 
 void validateAllSimpleData(List<Map<String, dynamic>> result) {
