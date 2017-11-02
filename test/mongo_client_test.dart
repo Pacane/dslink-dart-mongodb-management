@@ -81,6 +81,15 @@ void main() {
 
         expect(result, hasLength(limit));
       });
+
+      test("skip is respected", () async {
+        final skip = 2;
+        final code = {};
+
+        var result = await client.find(collectionName, code, limit, skip);
+
+        expect(result[0]['name'], 'martine');
+      });
     });
   });
 
@@ -109,6 +118,17 @@ void main() {
             .toList();
 
         expect(result, hasLength(limit));
+      });
+
+      test("skip is respected", () async {
+        final skip = 2;
+        final code = {};
+
+        var result = await client
+            .findStreaming(collectionName, code, limit, skip)
+            .toList();
+
+        expect(result[0]['name'], 'martine');
       });
     });
   });
