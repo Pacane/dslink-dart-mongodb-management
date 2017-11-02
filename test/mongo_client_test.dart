@@ -56,14 +56,14 @@ void main() {
     group('simple data', () {
       final collectionName = 'simple_data';
 
-      test('all', () async {
+      test('empty map returns all data', () async {
         final code = {};
         final result = await client.find(collectionName, code, limit, skip);
 
         validateAllSimpleData(result);
       });
 
-      test('regex', () async {
+      test('regex is supported', () async {
         final code = {
           "name": {"\$regex": "mat.*", "\$options": "i"}
         };
@@ -111,7 +111,8 @@ void main() {
 
     group('simple data', () {
       final collectionName = 'simple_data';
-      test('all', () async {
+
+      test('empty map returns all data', () async {
         final code = {};
 
         final result = await client
