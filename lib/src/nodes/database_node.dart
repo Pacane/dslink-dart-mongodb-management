@@ -61,6 +61,11 @@ class DatabaseNode extends SimpleNode {
     provider.setNode(refreshCollectionsNodePath,
         new RefreshCollectionsNode(refreshCollectionsNodePath, client));
 
+    final editConnectionNodePath = '$path/${EditConnectionNode.pathName}';
+    final editConnectionNode = new EditConnectionNode(
+        editConnectionNodePath, link, mongoClientFactory);
+    provider.setNode(editConnectionNodePath, editConnectionNode);
+
     link.save();
   }
 

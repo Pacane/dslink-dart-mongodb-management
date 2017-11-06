@@ -74,5 +74,12 @@ void main() {
           any, argThat(const isInstanceOf<RefreshCollectionsNode>())));
       verify(link.save());
     });
+
+    test('adds edit connection', () async {
+      await dbNode.onCreated();
+
+      verify(provider.setNode('$path/${EditConnectionNode.pathName}',
+          argThat(const isInstanceOf<EditConnectionNode>())));
+    });
   });
 }
