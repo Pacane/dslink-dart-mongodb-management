@@ -66,6 +66,9 @@ class DatabaseNode extends SimpleNode {
         editConnectionNodePath, link, mongoClientFactory);
     provider.setNode(editConnectionNodePath, editConnectionNode);
 
+    provider.addNode('$path/${RemoveConnectionAction.pathName}',
+        RemoveConnectionAction.definition());
+
     link.save();
   }
 

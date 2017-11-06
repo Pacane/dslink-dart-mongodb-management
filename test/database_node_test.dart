@@ -75,11 +75,18 @@ void main() {
       verify(link.save());
     });
 
-    test('adds edit connection', () async {
+    test('adds edit connection action', () async {
       await dbNode.onCreated();
 
       verify(provider.setNode('$path/${EditConnectionNode.pathName}',
           argThat(const isInstanceOf<EditConnectionNode>())));
+    });
+
+    test('adds remove connection action', () async {
+      await dbNode.onCreated();
+
+      verify(provider.addNode('$path/${RemoveConnectionAction.pathName}',
+          RemoveConnectionAction.definition()));
     });
   });
 }

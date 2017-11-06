@@ -12,7 +12,8 @@ Future<Null> main(List<String> args) async {
     AddConnectionNode.isType: (path) =>
         new AddConnectionNode(path, link, mongoClientFactory),
     DatabaseNode.isType: (path) =>
-        new DatabaseNode.restore(path, link, mongoClientFactory)
+    new DatabaseNode.restore(path, link, mongoClientFactory),
+    RemoveConnectionAction.isType: (path) => new RemoveConnectionAction(path)
   }, defaultNodes: {
     AddConnectionNode.pathName: AddConnectionNode.definition()
   });
