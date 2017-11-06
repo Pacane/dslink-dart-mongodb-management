@@ -11,13 +11,13 @@ import 'mocks.dart';
 void main() {
   Map<String, dynamic> validParams;
 
-  final code = '{}';
+  final selector = '{}';
   final limit = 0;
   final skip = 0;
 
   setUp(() {
     validParams = {
-      FindNodeParams.code: code,
+      FindNodeParams.selector: selector,
       FindNodeParams.skip: skip,
       FindNodeParams.limit: limit
     };
@@ -25,7 +25,7 @@ void main() {
 
   group('Null parameters validation', () {
     final testCases = <Tuple>[
-      const Tuple(FindNodeParams.code, FindNodeParams.invalidCodeErrorMsg),
+      const Tuple(FindNodeParams.selector, FindNodeParams.invalidSelectorErrorMsg),
       const Tuple(FindNodeParams.limit, FindNodeParams.invalidLimitErrorMsg),
       const Tuple(FindNodeParams.skip, FindNodeParams.invalidSkipErrorMsg),
     ];
@@ -40,11 +40,11 @@ void main() {
     }
   });
 
-  test('query code must be valid JSON', () {
-    validParams[FindNodeParams.code] = '{missing: quotes}';
+  test('selector must be valid JSON', () {
+    validParams[FindNodeParams.selector] = '{missing: quotes}';
 
     expect(() => FindNodeParams.validateParams(validParams),
-        throwsA(FindNodeParams.invalidCodeErrorMsg));
+        throwsA(FindNodeParams.invalidSelectorErrorMsg));
   });
 
   group('onInvoke', () {
@@ -61,7 +61,7 @@ void main() {
     test('delegates to MongoClient', () async {
       await node.onInvoke(validParams);
 
-      verify(client.find(collectionName, JSON.decode(code), limit, skip));
+      verify(client.find(collectionName, JSON.decode(selector), limit, skip));
     });
 
     test("returns a JSON encoded version of find's result", () async {
@@ -69,7 +69,7 @@ void main() {
         {'result': true}
       ];
       final expected = {'result': JSON.encode(findResult)};
-      when(client.find(collectionName, JSON.decode(code), limit, skip))
+      when(client.find(collectionName, JSON.decode(selector), limit, skip))
           .thenReturn(findResult);
 
       final actual = await node.onInvoke(validParams);

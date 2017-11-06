@@ -12,15 +12,15 @@ import 'mocks.dart';
 void main() {
   Map<String, dynamic> validParams;
 
-  final code = '{}';
+  final selector = '{}';
   final limit = 0;
   final skip = 0;
 
   setUp(() {
     validParams = {
-      FindNodeParams.code: code,
-      FindNodeParams.skip: skip,
-      FindNodeParams.limit: limit
+      FindStreamNodeParams.selector: selector,
+      FindStreamNodeParams.skip: skip,
+      FindStreamNodeParams.limit: limit
     };
   });
 
@@ -28,7 +28,7 @@ void main() {
   group('Null parameters validation', () {
     final testCases = <Tuple>[
       const Tuple(
-          FindStreamNodeParams.code, FindStreamNodeParams.invalidCodeErrorMsg),
+          FindStreamNodeParams.selector, FindStreamNodeParams.invalidSelectorErrorMsg),
       const Tuple(FindStreamNodeParams.limit,
           FindStreamNodeParams.invalidLimitErrorMsg),
       const Tuple(
@@ -38,7 +38,7 @@ void main() {
     for (var testCase in testCases) {
       test('throws when ${testCase.first} is null', () {
         expect(
-            () => FindNodeParams
+            () => FindStreamNodeParams
                 .validateParams(validParams..remove(testCase.first)),
             throwsA(testCase.second));
       });
@@ -46,10 +46,10 @@ void main() {
   });
 
   test('query code must be valid JSON', () {
-    validParams[FindNodeParams.code] = '{missing: quotes}';
+    validParams[FindNodeParams.selector] = '{missing: quotes}';
 
     expect(() => FindNodeParams.validateParams(validParams),
-        throwsA(FindNodeParams.invalidCodeErrorMsg));
+        throwsA(FindNodeParams.invalidSelectorErrorMsg));
   });
 
   group('onInvoke', () {
@@ -67,7 +67,7 @@ void main() {
       await node.onInvoke(validParams).toList();
 
       verify(
-          client.findStreaming(collectionName, JSON.decode(code), limit, skip));
+          client.findStreaming(collectionName, JSON.decode(selector), limit, skip));
     });
 
     // This is because it is the way DSA manages streaming tables.
@@ -84,7 +84,7 @@ void main() {
                 [JSON.encode(d)]
               ])
           .toList();
-      when(client.findStreaming(collectionName, JSON.decode(code), limit, skip))
+      when(client.findStreaming(collectionName, JSON.decode(selector), limit, skip))
           .thenReturn(findResult);
 
       final actual = await node.onInvoke(validParams).toList();

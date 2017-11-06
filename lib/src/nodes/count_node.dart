@@ -43,9 +43,9 @@ class CountNode extends SimpleNode {
   Future<Map<String, int>> onInvoke(Map<String, dynamic> params) async {
     CountNodeParams.validateParams(params);
 
-    final code = JSON.decode(params[CountNodeParams.selector]);
+    final selector = JSON.decode(params[CountNodeParams.selector]);
 
-    final result = await client.count(collectionName, code);
+    final result = await client.count(collectionName, selector);
 
     return {CountNode.result: result};
   }

@@ -50,12 +50,12 @@ class MongoClient {
   }
 
   Future<List<Map<String, dynamic>>> find(String collectionName,
-      Map<String, dynamic> code, int limit, int skip) async {
+      Map<String, dynamic> selector, int limit, int skip) async {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
     final sb = new SelectorBuilder();
-    sb.raw(code);
+    sb.raw(selector);
 
     final c = new Cursor(db, collection, sb);
 
@@ -67,12 +67,12 @@ class MongoClient {
   }
 
   Stream<Map<String, dynamic>> findStreaming(String collectionName,
-      Map<String, dynamic> code, int limit, int skip) async* {
+      Map<String, dynamic> selector, int limit, int skip) async* {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
     final sb = new SelectorBuilder();
-    sb.raw(code);
+    sb.raw(selector);
 
     final c = new Cursor(db, collection, sb);
 

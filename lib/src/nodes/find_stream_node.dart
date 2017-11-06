@@ -6,18 +6,18 @@ import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:dslink_dslink_mongodb_management/utils.dart';
 
 class FindStreamNodeParams {
-  static const String code = 'code';
+  static const String selector = 'selector';
   static const String limit = 'limit';
   static const String skip = 'skip';
 
   static const String invalidLimitErrorMsg = 'Invalid limit.';
   static const String invalidSkipErrorMsg = 'Invalid skip.';
-  static const String invalidCodeErrorMsg =
-      'Cannot parse query code properly. It should be valid JSON.';
+  static const String invalidSelectorErrorMsg =
+      'Cannot parse selector properly. It should be valid JSON.';
 
   static void validateParams(Map<String, String> params) {
-    if (isNullOrEmpty(params[code])) {
-      throw invalidCodeErrorMsg;
+    if (isNullOrEmpty(params[selector])) {
+      throw invalidSelectorErrorMsg;
     }
 
     if (params[limit] == null) {
@@ -29,9 +29,9 @@ class FindStreamNodeParams {
     }
 
     try {
-      JSON.decode(params[code]);
+      JSON.decode(params[selector]);
     } on FormatException catch (_) {
-      throw invalidCodeErrorMsg;
+      throw invalidSelectorErrorMsg;
     }
   }
 }
@@ -54,11 +54,11 @@ class FindStreamNode extends SimpleNode {
   Stream<List> onInvoke(Map<String, dynamic> params) async* {
     FindStreamNodeParams.validateParams(params);
 
-    final code = JSON.decode(params[FindStreamNodeParams.code]);
+    final selector = JSON.decode(params[FindStreamNodeParams.selector]);
     final limit = params[FindStreamNodeParams.limit];
     final skip = params[FindStreamNodeParams.skip];
 
-    final rows = client.findStreaming(collectionName, code, limit, skip);
+    final rows = client.findStreaming(collectionName, selector, limit, skip);
     await for (var row in rows) {
       final encodedRow = JSON.encode(row);
       yield [
@@ -74,10 +74,10 @@ class FindStreamNode extends SimpleNode {
         r"$invokable": "read",
         r"$params": [
           {
-            "name": FindStreamNodeParams.code,
+            "name": FindStreamNodeParams.selector,
             "type": "string",
             "editor": 'textarea',
-            "description": "Raw query code",
+            "description": "Selector",
             "placeholder": "{}"
           },
           {

@@ -67,17 +67,17 @@ void main() {
       final collectionName = 'simple_data';
 
       test('empty map returns all data', () async {
-        final code = {};
-        final result = await client.find(collectionName, code, limit, skip);
+        final selector = {};
+        final result = await client.find(collectionName, selector, limit, skip);
 
         validateAllSimpleData(result);
       });
 
       test('regex is supported', () async {
-        final code = {
+        final selector = {
           "name": {"\$regex": "mat.*", "\$options": "i"}
         };
-        final result = await client.find(collectionName, code, limit, skip);
+        final result = await client.find(collectionName, selector, limit, skip);
 
         expect(result, hasLength(1));
         expect(result[0]['name'], 'matt');
@@ -85,29 +85,29 @@ void main() {
 
       test("limit is respected", () async {
         final limit = 2;
-        final code = {};
+        final selector = {};
 
-        var result = await client.find(collectionName, code, limit, skip);
+        var result = await client.find(collectionName, selector, limit, skip);
 
         expect(result, hasLength(limit));
       });
 
       test("skip is respected", () async {
         final skip = 2;
-        final code = {};
+        final selector = {};
 
-        var result = await client.find(collectionName, code, limit, skip);
+        var result = await client.find(collectionName, selector, limit, skip);
 
         expect(result[0]['name'], 'martine');
       });
 
       test("orderby is supported", () async {
-        final code = {
+        final selector = {
           r'$query': {},
           r'$orderby': {'name': 1}
         };
 
-        var result = await client.find(collectionName, code, limit, skip);
+        var result = await client.find(collectionName, selector, limit, skip);
 
         var expected = copyAndSortResultsBy(result, 'name');
         expect(result, containsAllInOrder(expected));
@@ -118,15 +118,14 @@ void main() {
   group('findStream', () {
     final client = new MongoClient(uri, username, password);
     final limit = 0, skip = 0;
+    final selector = {};
 
     group('simple data', () {
       final collectionName = 'simple_data';
 
       test('empty map returns all data', () async {
-        final code = {};
-
         final result = await client
-            .findStreaming(collectionName, code, limit, skip)
+            .findStreaming(collectionName, selector, limit, skip)
             .toList();
 
         validateAllSimpleData(result);
@@ -134,10 +133,9 @@ void main() {
 
       test("limit is respected", () async {
         final limit = 2;
-        final code = {};
 
         var result = await client
-            .findStreaming(collectionName, code, limit, skip)
+            .findStreaming(collectionName, selector, limit, skip)
             .toList();
 
         expect(result, hasLength(limit));
@@ -145,10 +143,9 @@ void main() {
 
       test("skip is respected", () async {
         final skip = 2;
-        final code = {};
 
         var result = await client
-            .findStreaming(collectionName, code, limit, skip)
+            .findStreaming(collectionName, selector, limit, skip)
             .toList();
 
         expect(result[0]['name'], 'martine');
