@@ -35,5 +35,12 @@ void main() {
       verify(provider.setNode('$path/${FindStreamNode.pathName}',
           argThat(const isInstanceOf<FindStreamNode>())));
     });
+
+    test('count node', () {
+      node.onCreated();
+
+      verify(provider.setNode('$path/${CountNode.pathName}',
+          argThat(const isInstanceOf<CountNode>())));
+    });
   });
 }

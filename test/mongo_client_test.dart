@@ -8,11 +8,21 @@ void main() {
   final username = Platform.environment['DB_USERNAME'];
   final password = Platform.environment['DB_PASSWORD'];
 
+  final simpleDataCount = 9;
+
   assert(uriString != null);
   assert(username != null);
   assert(password != null);
 
   final uri = Uri.parse(uriString);
+
+  void validateAllSimpleData(List<Map<String, dynamic>> result) {
+    expect(result, hasLength(simpleDataCount));
+    expect(result[0]['name'], 'joel');
+    expect(result[1]['name'], 'matt');
+    expect(result[2]['name'], 'martine');
+    // more data
+  }
 
   group('test connection', () {
     test('returns OK when success', () async {
@@ -145,19 +155,31 @@ void main() {
       });
     });
   });
+
+  group('count', () {
+    final client = new MongoClient(uri, username, password);
+    final collectionName = 'simple_data';
+
+    test('count with empty selector returns count all', () async {
+      final result = await client.count(collectionName, {});
+
+      expect(result, simpleDataCount);
+    });
+
+    test('count respects regex selector', () async {
+      final result = await client.count(collectionName, {
+        "name": {"\$regex": "ma.*", "\$options": "i"}
+      });
+
+      expect(result, 2);
+    });
+  });
 }
 
-copyAndSortResultsBy(List<Map<String, dynamic>> result, dynamic valueToSortBy) {
+List<Map<String, dynamic>> copyAndSortResultsBy(
+    List<Map<String, dynamic>> result, dynamic valueToSortBy) {
   final expected = new List.from(result)
     ..sort((Map<String, dynamic> first, Map<String, dynamic> second) =>
         first[valueToSortBy].compareTo(second[valueToSortBy]));
   return expected;
-}
-
-void validateAllSimpleData(List<Map<String, dynamic>> result) {
-  expect(result, hasLength(9));
-  expect(result[0]['name'], 'joel');
-  expect(result[1]['name'], 'matt');
-  expect(result[2]['name'], 'martine');
-  // more data
 }

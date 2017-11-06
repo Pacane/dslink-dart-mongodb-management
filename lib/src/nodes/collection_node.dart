@@ -38,5 +38,9 @@ class CollectionNode extends SimpleNode {
     final findStreamNode = new FindStreamNode(
         '$path/${FindStreamNode.pathName}', client, collectionName);
     provider.setNode(findStreamNode.path, findStreamNode);
+
+    final countNode =
+        new CountNode('$path/${CountNode.pathName}', client, collectionName);
+    provider.setNode(countNode.path, countNode);
   }
 }

@@ -59,15 +59,11 @@ class MongoClient {
 
     final c = new Cursor(db, collection, sb);
 
-    try {
-      c.limit = limit;
-      c.skip = skip;
-      final result = await c.stream.toList();
+    c.limit = limit;
+    c.skip = skip;
+    final result = await c.stream.toList();
 
-      return result;
-    } catch (e) {
-      rethrow;
-    }
+    return result;
   }
 
   Stream<Map<String, dynamic>> findStreaming(String collectionName,
@@ -80,15 +76,21 @@ class MongoClient {
 
     final c = new Cursor(db, collection, sb);
 
-    try {
-      c.limit = limit;
-      c.skip = skip;
-      await for (var row in c.stream) {
-        yield row;
-      }
-    } catch (e) {
-      rethrow;
+    c.limit = limit;
+    c.skip = skip;
+    await for (var row in c.stream) {
+      yield row;
     }
+  }
+
+  Future<int> count(
+      String collectionName, Map<String, dynamic> selector) async {
+    final db = await connectionPool.connect();
+    final collection = db.collection(collectionName);
+
+    final count = await collection.count(selector);
+
+    return count;
   }
 }
 

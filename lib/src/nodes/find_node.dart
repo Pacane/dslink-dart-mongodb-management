@@ -39,6 +39,7 @@ class FindNodeParams {
 class FindNode extends SimpleNode {
   static const String pathName = 'find';
   static const String isType = 'findNode';
+  static const String _result = 'result';
 
   final MongoClient client;
   final String collectionName;
@@ -92,7 +93,7 @@ class FindNode extends SimpleNode {
           },
         ],
         r'$columns': [
-          {"name": "result", "type": "string"}
+          {"name": _result, "type": "string"}
         ],
       };
 }
