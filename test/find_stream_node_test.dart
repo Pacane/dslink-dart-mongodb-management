@@ -27,8 +27,8 @@ void main() {
   // TODO: See if we can use the FindNodeParams
   group('Null parameters validation', () {
     final testCases = <Tuple>[
-      const Tuple(
-          FindStreamNodeParams.selector, FindStreamNodeParams.invalidSelectorErrorMsg),
+      const Tuple(FindStreamNodeParams.selector,
+          FindStreamNodeParams.invalidSelectorErrorMsg),
       const Tuple(FindStreamNodeParams.limit,
           FindStreamNodeParams.invalidLimitErrorMsg),
       const Tuple(
@@ -66,8 +66,8 @@ void main() {
     test('delegates to MongoClient', () async {
       await node.onInvoke(validParams).toList();
 
-      verify(
-          client.findStreaming(collectionName, JSON.decode(selector), limit, skip));
+      verify(client.findStreaming(
+          collectionName, JSON.decode(selector), limit, skip));
     });
 
     // This is because it is the way DSA manages streaming tables.
@@ -84,7 +84,8 @@ void main() {
                 [JSON.encode(d)]
               ])
           .toList();
-      when(client.findStreaming(collectionName, JSON.decode(selector), limit, skip))
+      when(client.findStreaming(
+              collectionName, JSON.decode(selector), limit, skip))
           .thenReturn(findResult);
 
       final actual = await node.onInvoke(validParams).toList();

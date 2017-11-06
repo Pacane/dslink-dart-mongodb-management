@@ -25,7 +25,8 @@ void main() {
 
   group('Null parameters validation', () {
     final testCases = <Tuple>[
-      const Tuple(FindNodeParams.selector, FindNodeParams.invalidSelectorErrorMsg),
+      const Tuple(
+          FindNodeParams.selector, FindNodeParams.invalidSelectorErrorMsg),
       const Tuple(FindNodeParams.limit, FindNodeParams.invalidLimitErrorMsg),
       const Tuple(FindNodeParams.skip, FindNodeParams.invalidSkipErrorMsg),
     ];
