@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bson/bson.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:dslink_dslink_mongodb_management/nodes.dart';
 import 'package:dslink_dslink_mongodb_management/utils.dart';
@@ -81,6 +82,16 @@ void main() {
     test("doesn't crash with DateTime items", () {
       final findResult = [
         {'date': new DateTime.now()}
+      ];
+      when(client.find(collectionName, JSON.decode(selector), limit, skip))
+          .thenReturn(findResult);
+
+      expect(() => node.onInvoke(validParams), returnsNormally);
+    });
+
+    test("doesn't crash with objectId items", () {
+      final findResult = [
+        {'_id': new ObjectId.fromHexString('5a037dcf275c5fe584428f72')}
       ];
       when(client.find(collectionName, JSON.decode(selector), limit, skip))
           .thenReturn(findResult);

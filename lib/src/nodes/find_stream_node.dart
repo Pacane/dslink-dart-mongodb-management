@@ -60,7 +60,8 @@ class FindStreamNode extends SimpleNode {
 
     final rows = client.findStreaming(collectionName, selector, limit, skip);
     await for (var row in rows) {
-      final encodedRow = JSON.encode(row);
+      final encodedRow = JSON.encode(row, toEncodable: jsonifyMongoObjects);
+
       yield [
         [encodedRow]
       ];

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:bson/bson.dart';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:dslink_dslink_mongodb_management/nodes.dart';
 import 'package:dslink_dslink_mongodb_management/utils.dart';
@@ -91,6 +92,30 @@ void main() {
       final actual = await node.onInvoke(validParams).toList();
 
       expect(actual, expected);
+    });
+
+    test("doesn't crash with DateTime items", () async {
+      final findResult = [
+        {'date': new DateTime.now()}
+      ];
+      final streamResult = new Stream.fromIterable(findResult);
+      when(client.findStreaming(
+              collectionName, JSON.decode(selector), limit, skip))
+          .thenReturn(streamResult);
+
+      expect(() => node.onInvoke(validParams).toList(), returnsNormally);
+    });
+
+    test("doesn't crash with objectId items", () {
+      final findResult = [
+        {'_id': new ObjectId()}
+      ];
+      final streamResult = new Stream.fromIterable(findResult);
+      when(client.findStreaming(
+              collectionName, JSON.decode(selector), limit, skip))
+          .thenReturn(streamResult);
+
+      expect(() => node.onInvoke(validParams).toList(), returnsNormally);
     });
   });
 }
