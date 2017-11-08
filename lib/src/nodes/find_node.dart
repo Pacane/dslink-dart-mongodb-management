@@ -61,7 +61,9 @@ class FindNode extends SimpleNode {
 
     final result = await client.find(collectionName, selector, limit, skip);
 
-    final resultAsJsonString = JSON.encode(result);
+    final resultAsJsonString = JSON.encode(result,
+        toEncodable: (item) =>
+            item is DateTime ? item.toIso8601String() : item);
 
     return {'result': resultAsJsonString};
   }

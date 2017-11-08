@@ -77,5 +77,15 @@ void main() {
 
       expect(actual, expected);
     });
+
+    test("doesn't crash with DateTime items", () {
+      final findResult = [
+        {'date': new DateTime.now()}
+      ];
+      when(client.find(collectionName, JSON.decode(selector), limit, skip))
+          .thenReturn(findResult);
+
+      expect(() => node.onInvoke(validParams), returnsNormally);
+    });
   });
 }
