@@ -2,25 +2,73 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:pool/pool.dart';
 
 class MongoClientFactory {
   MongoClient create(Uri uri, String username, String password) =>
       new MongoClient(uri, username, password);
 }
 
+typedef Db _DbFactory();
+
+class ConnectionPool {
+  List<Db> _connections = [];
+  int _index = 0;
+  Pool _pool;
+
+  /// The maximum number of concurrent connections allowed.
+  final int maxConnections;
+
+  /// A [_DbFactory], a parameterless function that returns a [Db]. The function can be asynchronous if necessary.
+  final _DbFactory dbFactory;
+
+  /// Initializes a connection pool.
+  ///
+  /// * `maxConnections`: The maximum amount of connections to keep open simultaneously.
+  /// * `dbFactory*: a parameterless function that returns a [Db]. The function can be asynchronous if necessary.
+  ConnectionPool(this.maxConnections, this.dbFactory) {
+    _pool = new Pool(maxConnections);
+  }
+
+  /// Connects to the database, using an existent connection, only creating a new one if
+  /// the number of active connections is less than [maxConnections].
+  Future<Db> connect() {
+    return _pool.withResource/*<Db>*/(() async {
+      int i = _index;
+      if (_index >= maxConnections) _index = 0;
+
+      if (i < _connections.length)
+        return _connections[i];
+      else {
+        var db = await dbFactory();
+        await db.open();
+        _connections.add(db);
+        return db;
+      }
+    });
+  }
+
+  /// Closes all active database connections.
+  Future close() {
+    return Future
+        .wait(_connections.map/*<Future>*/((c) => c.close()))
+        .then((_) => _pool.close());
+  }
+}
+
 class MongoClient {
   final Uri uri;
   final String username;
   final String password;
-  final ConnectionPool connectionPool;
+
+  ConnectionPool connectionPool; // Not final due to 1.17.1 initialization
 
   static const int maxConnections = 3;
 
-  MongoClient(this.uri, this.username, this.password)
-      : connectionPool = new ConnectionPool(
-            maxConnections,
-            () => new Db(
-                makeAuthenticatedUri(uri, username, password).toString()));
+  MongoClient(this.uri, this.username, this.password) {
+    connectionPool = new ConnectionPool(maxConnections,
+        () => new Db(makeAuthenticatedUri(uri, username, password).toString()));
+  }
 
   Future<AuthResult> testConnection() async {
     final uriWithAuth = makeAuthenticatedUri(uri, username, password);

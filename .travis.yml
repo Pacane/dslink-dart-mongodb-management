@@ -1,4 +1,8 @@
 language: dart
+dart:
+- stable
+- dev
+- 1.17.1
 dart_task:
 - dartfmt
 - dartanalyzer: "--fatal-warnings lib"
