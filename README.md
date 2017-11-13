@@ -7,7 +7,7 @@ This DSLink has for goal to provide basic functionality over MongoDB instances.
 
 ## Features
 
-[x] Find many
-[x] Find many streaming
-[x] Distinct
-[] Insert
+- [x] Find many
+- [x] Find many streaming
+- [x] Distinct
+- [] Insert
