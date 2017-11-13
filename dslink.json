@@ -1,5 +1,5 @@
 {
-  "name": "dslink-dart-mongodb-management",
+  "name": "dslink-dart-mongodb-controller",
   "version": "1.0.0",
   "description": "MongoDB Management DSLink",
   "main": "bin/run.dart",
