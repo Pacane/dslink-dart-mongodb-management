@@ -1,4 +1,4 @@
-# dslink-dart-mongo-controller
+# dslink-dart-mongodb-controller
 
 [![Build Status](https://travis-ci.org/Pacane/dslink-dart-mongodb-management.svg?branch=master)](https://travis-ci.org/Pacane/dslink-dart-mongodb-management)
 
