@@ -10,5 +10,12 @@
     "pub get"
   ],
   "configs": {
+    "broker": {
+      "type": "url"
+    },
+    "name": {
+      "type": "string",
+      "default": "MongoDB"
+    }
   }
 }
