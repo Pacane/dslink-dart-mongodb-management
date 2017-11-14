@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
 import 'package:test/test.dart';
 
+import 'utils.dart';
+
 void main() {
   final uriString = Platform.environment['DB_URI'];
   final username = Platform.environment['DB_USERNAME'];
@@ -111,8 +113,7 @@ void main() {
 
         var expected = copyAndSortResultsBy(result, 'name');
         expect(result, containsAllInOrder(expected));
-      }, skip: true);
-      // Skipped because of 1.17.1
+      });
     });
   });
 

@@ -8,6 +8,7 @@ import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import 'mocks.dart';
+import 'utils.dart';
 
 void main() {
   final link = new LinkMock();
@@ -90,24 +91,24 @@ void main() {
         () async {
       when(provider.getNode(expectedDbNodePath)).thenReturn(someNode);
 
-      expect(() => node.onInvoke(validParams),
-          throwsA(AddConnectionNode.connectionAlreadyExistErrorMsg));
+      await expectThrowsAsync(() => node.onInvoke(validParams),
+          AddConnectionNode.connectionAlreadyExistErrorMsg);
     });
 
-    test('throws an error when credentials are wrong', () {
+    test('throws an error when credentials are wrong', () async {
       when(mongoClient.testConnection())
           .thenReturn(new Future.value(AuthResult.authError));
 
-      expect(() => node.onInvoke(validParams),
-          throwsA(AddConnectionNode.wrongCredentialsErrorMsg));
+      await expectThrowsAsync(() => node.onInvoke(validParams),
+          AddConnectionNode.wrongCredentialsErrorMsg);
     });
 
-    test('throws an error when database is unreachable', () {
+    test('throws an error when database is unreachable', () async {
       when(mongoClient.testConnection())
           .thenReturn(new Future.value(AuthResult.notFound));
 
-      expect(() => node.onInvoke(validParams),
-          throwsA(AddConnectionNode.notFoundErrorMsg));
+      await expectThrowsAsync(() => node.onInvoke(validParams),
+          AddConnectionNode.notFoundErrorMsg);
     });
   });
 }

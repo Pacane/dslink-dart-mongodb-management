@@ -65,6 +65,9 @@ void main() {
     });
 
     test('delegates to MongoClient', () async {
+      when(client.findStreaming(
+              collectionName, JSON.decode(selector), limit, skip))
+          .thenReturn(new Stream.empty());
       await node.onInvoke(validParams).toList();
 
       verify(client.findStreaming(
