@@ -1,5 +1,5 @@
-name: dslink_dslink_mongodb_management
-description: A sample command-line application.
+name: dslink_mongodb_controller
+description: MongoDB DSLink.
 version: 0.0.1
 
 environment:

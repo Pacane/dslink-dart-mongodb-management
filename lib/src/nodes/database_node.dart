@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:dslink/dslink.dart';
-import 'package:dslink_dslink_mongodb_management/mongo_dslink.dart';
-import 'package:dslink_dslink_mongodb_management/nodes.dart';
+import 'package:dslink_mongodb_controller/mongo_dslink.dart';
+import 'package:dslink_mongodb_controller/nodes.dart';
 
 class DatabaseNode extends SimpleNode {
   static String isType = 'databaseNode';

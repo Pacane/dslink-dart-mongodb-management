@@ -102,14 +102,12 @@ class MongoClient {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
-    final sb = new SelectorBuilder();
-    sb.raw(selector);
+    final sb = new SelectorBuilder()
+      ..raw(selector)
+      ..limit(limit)
+      ..skip(skip);
 
-    final c = new Cursor(db, collection, sb);
-
-    c.limit = limit;
-    c.skip = skip;
-    final result = await c.stream.toList();
+    final result = await collection.find(sb).toList();
 
     return result;
   }
@@ -119,14 +117,12 @@ class MongoClient {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
-    final sb = new SelectorBuilder();
-    sb.raw(selector);
+    final sb = new SelectorBuilder()
+      ..raw(selector)
+      ..limit(limit)
+      ..skip(skip);
 
-    final c = new Cursor(db, collection, sb);
-
-    c.limit = limit;
-    c.skip = skip;
-    await for (var row in c.stream) {
+    await for (var row in collection.find(sb)) {
       yield row;
     }
   }
