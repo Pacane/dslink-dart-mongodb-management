@@ -1,6 +1,6 @@
 # dslink-dart-mongodb-controller
 
-[![Build Status](https://travis-ci.org/Pacane/dslink-dart-mongodb-management.svg?branch=master)](https://travis-ci.org/Pacane/dslink-dart-mongodb-management)
+[![Build Status](https://travis-ci.org/IOT-DSA/dslink-dart-mongodb-controller.svg?branch=master)](https://travis-ci.org/IOT-DSA/dslink-dart-mongodb-controller)
 
 ## Overview
 This DSLink has for goal to provide basic functionality over MongoDB instances.
@@ -9,5 +9,7 @@ This DSLink has for goal to provide basic functionality over MongoDB instances.
 
 - [x] Find many
 - [x] Find many streaming
-- [x] Distinct
+- [ ] Find one
+- [ ] Fields projection in finds
+- [ ] Distinct
 - [ ] Insert
