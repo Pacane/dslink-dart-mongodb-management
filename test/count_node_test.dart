@@ -14,9 +14,7 @@ void main() {
   final selector = '{}';
 
   setUp(() {
-    validParams = {
-      CountNodeParams.selector: selector,
-    };
+    validParams = {CountNodeParams.selector: selector};
   });
 
   group('Null parameters validation', () {

@@ -107,8 +107,8 @@ void main() {
       when(mongoClient.testConnection())
           .thenReturn(new Future.value(AuthResult.notFound));
 
-      await expectThrowsAsync(() => node.onInvoke(validParams),
-          AddConnectionNode.notFoundErrorMsg);
+      await expectThrowsAsync(
+          () => node.onInvoke(validParams), AddConnectionNode.notFoundErrorMsg);
     });
   });
 }

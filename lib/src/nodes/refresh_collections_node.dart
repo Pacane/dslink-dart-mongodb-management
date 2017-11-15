@@ -22,9 +22,6 @@ class RefreshCollectionsNode extends SimpleNode {
     await (parent as DatabaseNode).refreshCollections();
   }
 
-  static Map<String, dynamic> definition() => {
-        r"$name": "Refresh collections",
-        r"$is": isType,
-        r"$invokable": "read",
-      };
+  static Map<String, dynamic> definition() =>
+      {r"$name": "Refresh collections", r"$is": isType, r"$invokable": "read"};
 }

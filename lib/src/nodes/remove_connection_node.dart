@@ -6,11 +6,8 @@ class RemoveConnectionAction extends SimpleNode {
 
   RemoveConnectionAction(String path) : super(path);
 
-  static Map<String, dynamic> definition() => {
-        r'$is': isType,
-        r'$name': 'Remove connection',
-        r'$invokable': 'write',
-      };
+  static Map<String, dynamic> definition() =>
+      {r'$is': isType, r'$name': 'Remove connection', r'$invokable': 'write'};
 
   bool get serializable => false;
 
