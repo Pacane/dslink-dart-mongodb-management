@@ -14,32 +14,31 @@ void main() {
   Map<String, dynamic> validParams;
 
   final selector = '{}';
+  final fields = '[]';
   final limit = 0;
   final skip = 0;
 
   setUp(() {
     validParams = {
-      FindStreamNodeParams.selector: selector,
-      FindStreamNodeParams.skip: skip,
-      FindStreamNodeParams.limit: limit
+      FindNodeParams.selector: selector,
+      FindNodeParams.skip: skip,
+      FindNodeParams.limit: limit,
+      FindNodeParams.fields: fields
     };
   });
 
-  // TODO: See if we can use the FindNodeParams
   group('Null parameters validation', () {
     final testCases = <Tuple>[
-      const Tuple(FindStreamNodeParams.selector,
-          FindStreamNodeParams.invalidSelectorErrorMsg),
-      const Tuple(FindStreamNodeParams.limit,
-          FindStreamNodeParams.invalidLimitErrorMsg),
       const Tuple(
-          FindStreamNodeParams.skip, FindStreamNodeParams.invalidSkipErrorMsg),
+          FindNodeParams.selector, FindNodeParams.invalidSelectorErrorMsg),
+      const Tuple(FindNodeParams.limit, FindNodeParams.invalidLimitErrorMsg),
+      const Tuple(FindNodeParams.skip, FindNodeParams.invalidSkipErrorMsg),
     ];
 
     for (var testCase in testCases) {
       test('throws when ${testCase.first} is null', () {
         expect(
-            () => FindStreamNodeParams
+            () => FindNodeParams
                 .validateParams(validParams..remove(testCase.first)),
             throwsA(testCase.second));
       });
@@ -65,13 +64,13 @@ void main() {
     });
 
     test('delegates to MongoClient', () async {
-      when(client.findStreaming(
-              collectionName, JSON.decode(selector), limit, skip))
+      when(client.findStreaming(collectionName, JSON.decode(selector),
+              JSON.decode(fields), limit, skip))
           .thenReturn(new Stream.empty());
       await node.onInvoke(validParams).toList();
 
-      verify(client.findStreaming(
-          collectionName, JSON.decode(selector), limit, skip));
+      verify(client.findStreaming(collectionName, JSON.decode(selector),
+          JSON.decode(fields), limit, skip));
     });
 
     // This is because it is the way DSA manages streaming tables.
@@ -88,8 +87,8 @@ void main() {
                 [JSON.encode(d)]
               ])
           .toList();
-      when(client.findStreaming(
-              collectionName, JSON.decode(selector), limit, skip))
+      when(client.findStreaming(collectionName, JSON.decode(selector),
+              JSON.decode(fields), limit, skip))
           .thenReturn(findResult);
 
       final actual = await node.onInvoke(validParams).toList();
@@ -102,8 +101,8 @@ void main() {
         {'date': new DateTime.now()}
       ];
       final streamResult = new Stream.fromIterable(findResult);
-      when(client.findStreaming(
-              collectionName, JSON.decode(selector), limit, skip))
+      when(client.findStreaming(collectionName, JSON.decode(selector),
+              JSON.decode(fields), limit, skip))
           .thenReturn(streamResult);
 
       expect(() => node.onInvoke(validParams).toList(), returnsNormally);
@@ -114,8 +113,8 @@ void main() {
         {'_id': new ObjectId()}
       ];
       final streamResult = new Stream.fromIterable(findResult);
-      when(client.findStreaming(
-              collectionName, JSON.decode(selector), limit, skip))
+      when(client.findStreaming(collectionName, JSON.decode(selector),
+              JSON.decode(fields), limit, skip))
           .thenReturn(streamResult);
 
       expect(() => node.onInvoke(validParams).toList(), returnsNormally);

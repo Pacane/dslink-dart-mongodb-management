@@ -63,14 +63,15 @@ void main() {
 
   group('find', () {
     final client = new MongoClient(uri, username, password);
-    final limit = 0, skip = 0;
+    final limit = 0, skip = 0, fields = [];
 
     group('simple data', () {
       final collectionName = 'simple_data';
 
       test('empty map returns all data', () async {
         final selector = {};
-        final result = await client.find(collectionName, selector, limit, skip);
+        final result =
+            await client.find(collectionName, selector, fields, limit, skip);
 
         validateAllSimpleData(result);
       });
@@ -79,17 +80,30 @@ void main() {
         final selector = {
           "name": {"\$regex": "mat.*", "\$options": "i"}
         };
-        final result = await client.find(collectionName, selector, limit, skip);
+        final result =
+            await client.find(collectionName, selector, fields, limit, skip);
 
         expect(result, hasLength(1));
         expect(result[0]['name'], 'matt');
+      });
+
+      test('field projection is supported', () async {
+        final selector = {'name': 'joel'};
+        final fields = ['dob'];
+        final result =
+            await client.find(collectionName, selector, fields, limit, skip);
+
+        expect(result, hasLength(1));
+        expect(result[0].containsKey('name'), isFalse);
+        expect(result[0]['dob'], 1990);
       });
 
       test("limit is respected", () async {
         final limit = 2;
         final selector = {};
 
-        var result = await client.find(collectionName, selector, limit, skip);
+        var result =
+            await client.find(collectionName, selector, fields, limit, skip);
 
         expect(result, hasLength(limit));
       });
@@ -98,7 +112,8 @@ void main() {
         final skip = 2;
         final selector = {};
 
-        var result = await client.find(collectionName, selector, limit, skip);
+        var result =
+            await client.find(collectionName, selector, fields, limit, skip);
 
         expect(result[0]['name'], 'martine');
       });
@@ -109,7 +124,8 @@ void main() {
           r'$orderby': {'name': 1}
         };
 
-        var result = await client.find(collectionName, selector, limit, skip);
+        var result =
+            await client.find(collectionName, selector, fields, limit, skip);
 
         var expected = copyAndSortResultsBy(result, 'name');
         expect(result, containsAllInOrder(expected));
@@ -119,7 +135,7 @@ void main() {
 
   group('findStream', () {
     final client = new MongoClient(uri, username, password);
-    final limit = 0, skip = 0;
+    final limit = 0, skip = 0, fields = [];
     final selector = {};
 
     group('simple data', () {
@@ -127,7 +143,7 @@ void main() {
 
       test('empty map returns all data', () async {
         final result = await client
-            .findStreaming(collectionName, selector, limit, skip)
+            .findStreaming(collectionName, selector, fields, limit, skip)
             .toList();
 
         validateAllSimpleData(result);
@@ -137,7 +153,7 @@ void main() {
         final limit = 2;
 
         var result = await client
-            .findStreaming(collectionName, selector, limit, skip)
+            .findStreaming(collectionName, selector, fields, limit, skip)
             .toList();
 
         expect(result, hasLength(limit));
@@ -147,10 +163,22 @@ void main() {
         final skip = 2;
 
         var result = await client
-            .findStreaming(collectionName, selector, limit, skip)
+            .findStreaming(collectionName, selector, fields, limit, skip)
             .toList();
 
         expect(result[0]['name'], 'martine');
+      });
+
+      test('field projection is supported', () async {
+        final selector = {'name': 'joel'};
+        final fields = ['dob'];
+        final result = await client
+            .findStreaming(collectionName, selector, fields, limit, skip)
+            .toList();
+
+        expect(result, hasLength(1));
+        expect(result[0].containsKey('name'), isFalse);
+        expect(result[0]['dob'], 1990);
       });
     });
   });

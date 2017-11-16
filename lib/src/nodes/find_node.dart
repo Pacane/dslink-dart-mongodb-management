@@ -7,31 +7,50 @@ import 'package:dslink_mongodb_controller/utils.dart';
 
 class FindNodeParams {
   static const String selector = 'selector';
+  static const String fields = 'fields';
   static const String limit = 'limit';
   static const String skip = 'skip';
 
   static const String invalidLimitErrorMsg = 'Invalid limit.';
   static const String invalidSkipErrorMsg = 'Invalid skip.';
   static const String invalidSelectorErrorMsg =
-      'Cannot parse selector properly. It should be valid JSON.';
+      'Cannot parse selector properly. It should be a valid JSON map.';
+  static const String invalidFieldsErrorMsg =
+      'Cannot parse fields projection. It should be a valid JSON list of strings.';
 
   static void validateParams(Map<String, String> params) {
-    if (isNullOrEmpty(params[selector])) {
+    if (params[selector] is! String || isNullOrEmpty(params[selector])) {
       throw invalidSelectorErrorMsg;
     }
 
-    if (params[limit] == null) {
+    if (isNullOrEmpty(params[fields])) {
+      throw invalidFieldsErrorMsg;
+    }
+
+    if (params[limit] is! int || params[limit] == null) {
       throw invalidLimitErrorMsg;
     }
 
-    if (params[skip] == null) {
+    if (params[limit] is! int || params[skip] == null) {
       throw invalidSkipErrorMsg;
     }
 
     try {
-      JSON.decode(params[selector]);
+      final decodedSelector = JSON.decode(params[selector]);
+      if (decodedSelector is! Map) {
+        throw new FormatException('Selector is not a Map.');
+      }
     } on FormatException catch (_) {
       throw invalidSelectorErrorMsg;
+    }
+
+    try {
+      final decodedFields = JSON.decode(params[fields]);
+      if (!(decodedFields is List && decodedFields.every((i) => i is String))) {
+        throw new FormatException('Fields is not a List of Strings');
+      }
+    } on FormatException catch (_) {
+      throw invalidFieldsErrorMsg;
     }
   }
 }
@@ -55,11 +74,12 @@ class FindNode extends SimpleNode {
   Future<Map<String, String>> onInvoke(Map<String, dynamic> params) async {
     FindNodeParams.validateParams(params);
 
-    final selector = JSON.decode(params[FindNodeParams.selector]);
+    final selector = JSON.decode(params[FindNodeParams.selector]) as Map;
+    final fields = JSON.decode(params[FindNodeParams.fields]) as List<String>;
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
 
-    final result = await client.find(collectionName, selector, limit, skip);
+    final result = await client.find(collectionName, selector, fields, limit, skip);
 
     final resultAsJsonString =
         JSON.encode(result, toEncodable: jsonifyMongoObjects);
@@ -78,6 +98,13 @@ class FindNode extends SimpleNode {
             "editor": 'textarea',
             "description": "Selector",
             "placeholder": "{}"
+          },
+          {
+            "name": FindNodeParams.fields,
+            "type": "string",
+            "editor": 'textarea',
+            "description": "Fields projection",
+            "placeholder": "[]"
           },
           {
             "name": FindNodeParams.limit,

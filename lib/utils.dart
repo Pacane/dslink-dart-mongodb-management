@@ -20,3 +20,7 @@ jsonifyMongoObjects(dynamic item) {
 
   return item;
 }
+
+bool isA(dynamic obj, Type t1, Type t2) {
+  return obj.runtimeType == t1 && obj.every((i) => i.runtimeType == t2);
+}
