@@ -79,7 +79,8 @@ class FindNode extends SimpleNode {
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
 
-    final result = await client.find(collectionName, selector, fields, limit, skip);
+    final result =
+        await client.find(collectionName, selector, fields, limit, skip);
 
     final resultAsJsonString =
         JSON.encode(result, toEncodable: jsonifyMongoObjects);
