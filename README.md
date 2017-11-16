@@ -31,4 +31,8 @@ Projects the fields in the query. Expects a JSON array of Strings. By default an
 
 _example_ : `["name", "age"]`
 
-#### Limit/Skip
+#### Limit
+Limits the amount of records in the result. Expects an integer. Defaults to 0.
+
+#### Skip
+Skip `n` records in the results. Expects an integer. Defaults to 0.
