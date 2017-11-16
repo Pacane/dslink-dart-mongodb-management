@@ -3,38 +3,8 @@ import 'dart:convert';
 
 import 'package:dslink/dslink.dart';
 import 'package:dslink_mongodb_controller/mongo_dslink.dart';
+import 'package:dslink_mongodb_controller/nodes.dart';
 import 'package:dslink_mongodb_controller/utils.dart';
-
-class FindStreamNodeParams {
-  static const String selector = 'selector';
-  static const String limit = 'limit';
-  static const String skip = 'skip';
-
-  static const String invalidLimitErrorMsg = 'Invalid limit.';
-  static const String invalidSkipErrorMsg = 'Invalid skip.';
-  static const String invalidSelectorErrorMsg =
-      'Cannot parse selector properly. It should be valid JSON.';
-
-  static void validateParams(Map<String, String> params) {
-    if (isNullOrEmpty(params[selector])) {
-      throw invalidSelectorErrorMsg;
-    }
-
-    if (params[limit] == null) {
-      throw invalidLimitErrorMsg;
-    }
-
-    if (params[skip] == null) {
-      throw invalidSkipErrorMsg;
-    }
-
-    try {
-      JSON.decode(params[selector]);
-    } on FormatException catch (_) {
-      throw invalidSelectorErrorMsg;
-    }
-  }
-}
 
 class FindStreamNode extends SimpleNode {
   static const String pathName = 'findStream';
@@ -52,13 +22,15 @@ class FindStreamNode extends SimpleNode {
 
   @override
   Stream<List> onInvoke(Map<String, dynamic> params) async* {
-    FindStreamNodeParams.validateParams(params);
+    FindNodeParams.validateParams(params);
 
-    final selector = JSON.decode(params[FindStreamNodeParams.selector]);
-    final limit = params[FindStreamNodeParams.limit];
-    final skip = params[FindStreamNodeParams.skip];
+    final selector = JSON.decode(params[FindNodeParams.selector]) as Map;
+    final fields = JSON.decode(params[FindNodeParams.fields]) as List<String>;
+    final limit = params[FindNodeParams.limit];
+    final skip = params[FindNodeParams.skip];
 
-    final rows = client.findStreaming(collectionName, selector, limit, skip);
+    final rows =
+        client.findStreaming(collectionName, selector, fields, limit, skip);
     await for (var row in rows) {
       final encodedRow = JSON.encode(row, toEncodable: jsonifyMongoObjects);
 
@@ -75,21 +47,28 @@ class FindStreamNode extends SimpleNode {
         r"$invokable": "read",
         r"$params": [
           {
-            "name": FindStreamNodeParams.selector,
+            "name": FindNodeParams.selector,
             "type": "string",
             "editor": 'textarea',
             "description": "Selector",
             "placeholder": "{}"
           },
           {
-            "name": FindStreamNodeParams.limit,
+            "name": FindNodeParams.fields,
+            "type": "string",
+            "editor": 'textarea',
+            "description": "Fields projection",
+            "placeholder": "[]"
+          },
+          {
+            "name": FindNodeParams.limit,
             "type": "number",
             "default": 0,
             "description":
                 "max number of items in the query (0 equals no limit)",
           },
           {
-            "name": FindStreamNodeParams.skip,
+            "name": FindNodeParams.skip,
             "type": "number",
             "default": 0,
             "description": "Amount of results to skip for the query",

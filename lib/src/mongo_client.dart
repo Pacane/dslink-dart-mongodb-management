@@ -97,12 +97,17 @@ class MongoClient {
     return db.getCollectionNames();
   }
 
-  Future<List<Map<String, dynamic>>> find(String collectionName,
-      Map<String, dynamic> selector, int limit, int skip) async {
+  Future<List<Map<String, dynamic>>> find(
+      String collectionName,
+      Map<String, dynamic> selector,
+      List<String> fields,
+      int limit,
+      int skip) async {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
     final sb = new SelectorBuilder()
+      ..fields(fields)
       ..raw(selector)
       ..limit(limit)
       ..skip(skip);
@@ -112,12 +117,17 @@ class MongoClient {
     return result;
   }
 
-  Stream<Map<String, dynamic>> findStreaming(String collectionName,
-      Map<String, dynamic> selector, int limit, int skip) async* {
+  Stream<Map<String, dynamic>> findStreaming(
+      String collectionName,
+      Map<String, dynamic> selector,
+      List<String> fields,
+      int limit,
+      int skip) async* {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
     final sb = new SelectorBuilder()
+      ..fields(fields)
       ..raw(selector)
       ..limit(limit)
       ..skip(skip);

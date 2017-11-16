@@ -13,12 +13,14 @@ void main() {
   Map<String, dynamic> validParams;
 
   final selector = '{}';
+  final fields = '[]';
   final limit = 0;
   final skip = 0;
 
   setUp(() {
     validParams = {
       FindNodeParams.selector: selector,
+      FindNodeParams.fields: fields,
       FindNodeParams.skip: skip,
       FindNodeParams.limit: limit
     };
@@ -26,6 +28,7 @@ void main() {
 
   group('Null parameters validation', () {
     final testCases = <Tuple>[
+      const Tuple(FindNodeParams.fields, FindNodeParams.invalidFieldsErrorMsg),
       const Tuple(
           FindNodeParams.selector, FindNodeParams.invalidSelectorErrorMsg),
       const Tuple(FindNodeParams.limit, FindNodeParams.invalidLimitErrorMsg),
@@ -42,11 +45,44 @@ void main() {
     }
   });
 
-  test('selector must be valid JSON', () {
-    validParams[FindNodeParams.selector] = '{missing: quotes}';
+  group('selector must be valid JSON map', () {
+    test('throws when invalid JSON', () {
+      validParams[FindNodeParams.selector] = '{missing: quotes}';
 
-    expect(() => FindNodeParams.validateParams(validParams),
-        throwsA(FindNodeParams.invalidSelectorErrorMsg));
+      expect(() => FindNodeParams.validateParams(validParams),
+          throwsA(FindNodeParams.invalidSelectorErrorMsg));
+    });
+
+    test('throws when a list', () {
+      validParams[FindNodeParams.selector] = '[]';
+
+      expect(() => FindNodeParams.validateParams(validParams),
+          throwsA(FindNodeParams.invalidSelectorErrorMsg));
+    });
+
+    test("doesn't throw when valid", () {
+      test('throws when a number', () {
+        validParams[FindNodeParams.selector] = '{}';
+
+        expect(
+            () => FindNodeParams.validateParams(validParams), returnsNormally);
+      });
+    });
+  });
+
+  group('fields must be a valid JSON list of strings', () {
+    test('throws when invalid JSON', () {
+      validParams[FindNodeParams.fields] = '{]';
+
+      expect(() => FindNodeParams.validateParams(validParams),
+          throwsA(FindNodeParams.invalidFieldsErrorMsg));
+    });
+    test('throws when not a list of strings', () {
+      validParams[FindNodeParams.fields] = '[1,2,3]';
+
+      expect(() => FindNodeParams.validateParams(validParams),
+          throwsA(FindNodeParams.invalidFieldsErrorMsg));
+    });
   });
 
   group('onInvoke', () {
@@ -63,7 +99,8 @@ void main() {
     test('delegates to MongoClient', () async {
       await node.onInvoke(validParams);
 
-      verify(client.find(collectionName, JSON.decode(selector), limit, skip));
+      verify(client.find(collectionName, JSON.decode(selector),
+          JSON.decode(fields), limit, skip));
     });
 
     test("returns a JSON encoded version of find's result", () async {
@@ -71,7 +108,7 @@ void main() {
         {'result': true}
       ];
       final expected = {'result': JSON.encode(findResult)};
-      when(client.find(any, any, any, any)).thenReturn(findResult);
+      when(client.find(any, any, any, any, any)).thenReturn(findResult);
 
       final actual = await node.onInvoke(validParams);
 
@@ -82,7 +119,8 @@ void main() {
       final findResult = [
         {'date': new DateTime.now()}
       ];
-      when(client.find(collectionName, JSON.decode(selector), limit, skip))
+      when(client.find(collectionName, JSON.decode(selector),
+              JSON.decode(fields), limit, skip))
           .thenReturn(findResult);
 
       expect(() => node.onInvoke(validParams), returnsNormally);
@@ -92,7 +130,8 @@ void main() {
       final findResult = [
         {'_id': new ObjectId.fromHexString('5a037dcf275c5fe584428f72')}
       ];
-      when(client.find(collectionName, JSON.decode(selector), limit, skip))
+      when(client.find(collectionName, JSON.decode(selector),
+              JSON.decode(fields), limit, skip))
           .thenReturn(findResult);
 
       expect(() => node.onInvoke(validParams), returnsNormally);
