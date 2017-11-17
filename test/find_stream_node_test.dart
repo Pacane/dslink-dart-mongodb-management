@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:bson/bson.dart';
 import 'package:dslink_mongodb_controller/mongo_dslink.dart';
 import 'package:dslink_mongodb_controller/nodes.dart';
-import 'package:dslink_mongodb_controller/utils.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -15,6 +14,7 @@ void main() {
 
   final selector = '{}';
   final fields = '[]';
+  final dateFields = '[]';
   final limit = 0;
   final skip = 0;
 
@@ -23,26 +23,9 @@ void main() {
       FindNodeParams.selector: selector,
       FindNodeParams.skip: skip,
       FindNodeParams.limit: limit,
-      FindNodeParams.fields: fields
+      FindNodeParams.fields: fields,
+      FindNodeParams.dateFields: dateFields
     };
-  });
-
-  group('Null parameters validation', () {
-    final testCases = <Tuple>[
-      const Tuple(
-          FindNodeParams.selector, FindNodeParams.invalidSelectorErrorMsg),
-      const Tuple(FindNodeParams.limit, FindNodeParams.invalidLimitErrorMsg),
-      const Tuple(FindNodeParams.skip, FindNodeParams.invalidSkipErrorMsg),
-    ];
-
-    for (var testCase in testCases) {
-      test('throws when ${testCase.first} is null', () {
-        expect(
-            () => FindNodeParams
-                .validateParams(validParams..remove(testCase.first)),
-            throwsA(testCase.second));
-      });
-    }
   });
 
   test('query code must be valid JSON', () {
@@ -118,6 +101,47 @@ void main() {
           .thenReturn(streamResult);
 
       expect(() => node.onInvoke(validParams).toList(), returnsNormally);
+    });
+
+    group('ISO dates are revived correctly as DateTime in selector', () {
+      setUp(() {
+        final dateFields = '["date"]';
+        validParams[FindNodeParams.dateFields] = dateFields;
+        when(client.findStreaming(any, any, any, any, any))
+            .thenReturn(new Stream.empty());
+      });
+
+      test('exact value as string is revived', () async {
+        final selector = '{"date": "2017-11-16T00:00:00.000Z"}';
+        validParams[FindNodeParams.selector] = selector;
+
+        await node.onInvoke(validParams).toList();
+
+        var actualSelector =
+            verify(client.findStreaming(any, captureAny, any, any, any))
+                .captured[0];
+        expect(actualSelector['date'], new isInstanceOf<DateTime>());
+      });
+
+      test('date range values are revived', () async {
+        final selector = r'''
+            {
+              "date": {
+                        "$lt": "2017-11-16T00:00:00.000Z", 
+                        "$gt": "2016-11-16T00:00:00.000Z"
+              }
+            }
+            ''';
+        validParams[FindNodeParams.selector] = selector;
+
+        await node.onInvoke(validParams).toList();
+
+        var actualSelector =
+            verify(client.findStreaming(any, captureAny, any, any, any))
+                .captured[0];
+        expect(actualSelector['date']['\$lt'], new isInstanceOf<DateTime>());
+        expect(actualSelector['date']['\$gt'], new isInstanceOf<DateTime>());
+      });
     });
   });
 }

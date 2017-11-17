@@ -24,7 +24,11 @@ class FindStreamNode extends SimpleNode {
   Stream<List> onInvoke(Map<String, dynamic> params) async* {
     FindNodeParams.validateParams(params);
 
-    final selector = JSON.decode(params[FindNodeParams.selector]) as Map;
+    final dateKeys =
+        JSON.decode(params[FindNodeParams.dateFields]) as List<String>;
+
+    final selector = JSON.decode(params[FindNodeParams.selector],
+        reviver: (key, value) => reviveDates(dateKeys, key, value)) as Map;
     final fields = JSON.decode(params[FindNodeParams.fields]) as List<String>;
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
@@ -50,15 +54,22 @@ class FindStreamNode extends SimpleNode {
             "name": FindNodeParams.selector,
             "type": "string",
             "editor": 'textarea',
-            "description": "Selector",
-            "placeholder": "{}"
+            "description": "Selector (JSON Map)",
+            "default": "{}"
           },
           {
             "name": FindNodeParams.fields,
             "type": "string",
             "editor": 'textarea',
-            "description": "Fields projection",
-            "placeholder": "[]"
+            "description": "Fields projection (JSON List of Strings)",
+            "default": "[]"
+          },
+          {
+            "name": FindNodeParams.dateFields,
+            "type": "string",
+            "editor": 'textarea',
+            "description": "Date fields (JSON List of Strings)",
+            "default": "[]"
           },
           {
             "name": FindNodeParams.limit,

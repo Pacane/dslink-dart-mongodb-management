@@ -8,6 +8,7 @@ import 'package:dslink_mongodb_controller/utils.dart';
 class FindNodeParams {
   static const String selector = 'selector';
   static const String fields = 'fields';
+  static const String dateFields = 'dateFields';
   static const String limit = 'limit';
   static const String skip = 'skip';
 
@@ -17,6 +18,8 @@ class FindNodeParams {
       'Cannot parse selector properly. It should be a valid JSON map.';
   static const String invalidFieldsErrorMsg =
       'Cannot parse fields projection. It should be a valid JSON list of strings.';
+  static const String invalidDateFieldsErrorMsg =
+      'Cannot parse date fields. It should be a valid JSON list of strings.';
 
   static void validateParams(Map<String, String> params) {
     if (params[selector] is! String || isNullOrEmpty(params[selector])) {
@@ -44,13 +47,18 @@ class FindNodeParams {
       throw invalidSelectorErrorMsg;
     }
 
+    checkIsListOfString(params[fields], invalidFieldsErrorMsg);
+    checkIsListOfString(params[dateFields], invalidDateFieldsErrorMsg);
+  }
+
+  static checkIsListOfString(String parameter, String errorMsg) {
     try {
-      final decodedFields = JSON.decode(params[fields]);
-      if (!(decodedFields is List && decodedFields.every((i) => i is String))) {
-        throw new FormatException('Fields is not a List of Strings');
+      final decodedParam = JSON.decode(parameter);
+      if (!(decodedParam is List && decodedParam.every((i) => i is String))) {
+        throw errorMsg;
       }
-    } on FormatException catch (_) {
-      throw invalidFieldsErrorMsg;
+    } catch (e) {
+      throw errorMsg;
     }
   }
 }
@@ -74,7 +82,12 @@ class FindNode extends SimpleNode {
   Future<Map<String, String>> onInvoke(Map<String, dynamic> params) async {
     FindNodeParams.validateParams(params);
 
-    final selector = JSON.decode(params[FindNodeParams.selector]) as Map;
+    final dateKeys =
+        JSON.decode(params[FindNodeParams.dateFields]) as List<String>;
+
+    final selector = JSON.decode(params[FindNodeParams.selector],
+        reviver: (key, value) => reviveDates(dateKeys, key, value)) as Map;
+
     final fields = JSON.decode(params[FindNodeParams.fields]) as List<String>;
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
@@ -97,15 +110,22 @@ class FindNode extends SimpleNode {
             "name": FindNodeParams.selector,
             "type": "string",
             "editor": 'textarea',
-            "description": "Selector",
-            "placeholder": "{}"
+            "description": "Selector (JSON Map)",
+            "default": "{}"
           },
           {
             "name": FindNodeParams.fields,
             "type": "string",
             "editor": 'textarea',
-            "description": "Fields projection",
-            "placeholder": "[]"
+            "description": "Fields projection (JSON List of Strings)",
+            "default": "[]"
+          },
+          {
+            "name": FindNodeParams.dateFields,
+            "type": "string",
+            "editor": 'textarea',
+            "description": "Date fields (JSON List of Strings)",
+            "default": "[]"
           },
           {
             "name": FindNodeParams.limit,
