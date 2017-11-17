@@ -107,8 +107,8 @@ class MongoClient {
     final collection = db.collection(collectionName);
 
     final sb = new SelectorBuilder()
-      ..fields(fields)
       ..raw(selector)
+      ..fields(fields)
       ..limit(limit)
       ..skip(skip);
 
@@ -127,8 +127,8 @@ class MongoClient {
     final collection = db.collection(collectionName);
 
     final sb = new SelectorBuilder()
-      ..fields(fields)
       ..raw(selector)
+      ..fields(fields)
       ..limit(limit)
       ..skip(skip);
 

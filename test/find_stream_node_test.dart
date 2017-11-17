@@ -102,5 +102,46 @@ void main() {
 
       expect(() => node.onInvoke(validParams).toList(), returnsNormally);
     });
+
+    group('ISO dates are revived correctly as DateTime in selector', () {
+      setUp(() {
+        final dateFields = '["date"]';
+        validParams[FindNodeParams.dateFields] = dateFields;
+        when(client.findStreaming(any, any, any, any, any))
+            .thenReturn(new Stream.empty());
+      });
+
+      test('exact value as string is revived', () async {
+        final selector = '{"date": "2017-11-16T00:00:00.000Z"}';
+        validParams[FindNodeParams.selector] = selector;
+
+        await node.onInvoke(validParams).toList();
+
+        var actualSelector =
+            verify(client.findStreaming(any, captureAny, any, any, any))
+                .captured[0];
+        expect(actualSelector['date'], new isInstanceOf<DateTime>());
+      });
+
+      test('date range values are revived', () async {
+        final selector = r'''
+            {
+              "date": {
+                        "$lt": "2017-11-16T00:00:00.000Z", 
+                        "$gt": "2016-11-16T00:00:00.000Z"
+              }
+            }
+            ''';
+        validParams[FindNodeParams.selector] = selector;
+
+        await node.onInvoke(validParams).toList();
+
+        var actualSelector =
+            verify(client.findStreaming(any, captureAny, any, any, any))
+                .captured[0];
+        expect(actualSelector['date']['\$lt'], new isInstanceOf<DateTime>());
+        expect(actualSelector['date']['\$gt'], new isInstanceOf<DateTime>());
+      });
+    });
   });
 }
