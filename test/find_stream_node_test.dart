@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:bson/bson.dart';
 import 'package:dslink_mongodb_controller/mongo_dslink.dart';
 import 'package:dslink_mongodb_controller/nodes.dart';
-import 'package:dslink_mongodb_controller/utils.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -15,6 +14,7 @@ void main() {
 
   final selector = '{}';
   final fields = '[]';
+  final dateFields = '[]';
   final limit = 0;
   final skip = 0;
 
@@ -23,26 +23,9 @@ void main() {
       FindNodeParams.selector: selector,
       FindNodeParams.skip: skip,
       FindNodeParams.limit: limit,
-      FindNodeParams.fields: fields
+      FindNodeParams.fields: fields,
+      FindNodeParams.dateFields: dateFields
     };
-  });
-
-  group('Null parameters validation', () {
-    final testCases = <Tuple>[
-      const Tuple(
-          FindNodeParams.selector, FindNodeParams.invalidSelectorErrorMsg),
-      const Tuple(FindNodeParams.limit, FindNodeParams.invalidLimitErrorMsg),
-      const Tuple(FindNodeParams.skip, FindNodeParams.invalidSkipErrorMsg),
-    ];
-
-    for (var testCase in testCases) {
-      test('throws when ${testCase.first} is null', () {
-        expect(
-            () => FindNodeParams
-                .validateParams(validParams..remove(testCase.first)),
-            throwsA(testCase.second));
-      });
-    }
   });
 
   test('query code must be valid JSON', () {
