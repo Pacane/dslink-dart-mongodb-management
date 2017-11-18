@@ -132,9 +132,7 @@ class MongoClient {
       ..limit(limit)
       ..skip(skip);
 
-    await for (var row in collection.find(sb)) {
-      yield row;
-    }
+    yield* collection.find(sb);
   }
 
   Future<int> count(
