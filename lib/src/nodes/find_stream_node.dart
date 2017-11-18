@@ -33,15 +33,17 @@ class FindStreamNode extends SimpleNode {
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
 
-    final rows =
-        client.findStreaming(collectionName, selector, fields, limit, skip);
-    await for (var row in rows) {
+    final rows = client
+        .findStreaming(collectionName, selector, fields, limit, skip)
+        .map((row) {
       final encodedRow = JSON.encode(row, toEncodable: jsonifyMongoObjects);
 
-      yield [
+      return [
         [encodedRow]
       ];
-    }
+    });
+
+    yield* rows;
   }
 
   static Map<String, dynamic> definition() => {
