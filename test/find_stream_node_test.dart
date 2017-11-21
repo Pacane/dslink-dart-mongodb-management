@@ -121,7 +121,8 @@ void main() {
 
         var actualSelector =
             verify(client.findStreaming(any, captureAny, any, any, any, any))
-                .captured[0];
+                .captured
+                .first;
         expect(actualSelector['date'], new isInstanceOf<DateTime>());
       });
 
@@ -140,7 +141,8 @@ void main() {
 
         var actualSelector =
             verify(client.findStreaming(any, captureAny, any, any, any, any))
-                .captured[0];
+                .captured
+                .first;
         expect(actualSelector['date']['\$lt'], new isInstanceOf<DateTime>());
         expect(actualSelector['date']['\$gt'], new isInstanceOf<DateTime>());
       });

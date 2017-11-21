@@ -152,8 +152,9 @@ void main() {
         await node.onInvoke(validParams);
 
         var actualSelector =
-            verify(client.find(any, captureAny, any, any, any, any)).captured[
-                0];
+            verify(client.find(any, captureAny, any, any, any, any))
+                .captured
+                .first;
         expect(actualSelector['date']['\$lt'], new isInstanceOf<DateTime>());
         expect(actualSelector['date']['\$gt'], new isInstanceOf<DateTime>());
       });
