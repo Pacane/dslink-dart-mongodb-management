@@ -102,7 +102,8 @@ class MongoClient {
       Map<String, dynamic> selector,
       List<String> fields,
       int limit,
-      int skip) async {
+      int skip,
+      int batchSize) async {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
@@ -110,6 +111,7 @@ class MongoClient {
       ..raw(selector)
       ..fields(fields)
       ..limit(limit)
+      ..batchSize(batchSize)
       ..skip(skip);
 
     final result = await collection.find(sb).toList();
@@ -122,7 +124,8 @@ class MongoClient {
       Map<String, dynamic> selector,
       List<String> fields,
       int limit,
-      int skip) async* {
+      int skip,
+      int batchSize) async* {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 
@@ -130,6 +133,7 @@ class MongoClient {
       ..raw(selector)
       ..fields(fields)
       ..limit(limit)
+      ..batchSize(batchSize)
       ..skip(skip);
 
     yield* collection.find(sb);

@@ -32,9 +32,10 @@ class FindStreamNode extends SimpleNode {
     final fields = JSON.decode(params[FindNodeParams.fields]) as List<String>;
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
+    final batchSize = params[FindNodeParams.batchSize];
 
     final rows = client
-        .findStreaming(collectionName, selector, fields, limit, skip)
+        .findStreaming(collectionName, selector, fields, limit, skip, batchSize)
         .map((row) {
       final encodedRow = JSON.encode(row, toEncodable: jsonifyMongoObjects);
 

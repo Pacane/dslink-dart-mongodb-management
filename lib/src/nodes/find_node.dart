@@ -10,10 +10,12 @@ class FindNodeParams {
   static const String fields = 'fields';
   static const String dateFields = 'dateFields';
   static const String limit = 'limit';
+  static const String batchSize = 'batchSize';
   static const String skip = 'skip';
 
   static const String invalidLimitErrorMsg = 'Invalid limit.';
   static const String invalidSkipErrorMsg = 'Invalid skip.';
+  static const String invalidBatchSizeErrorMsg = 'Invalid batch size.';
   static const String invalidSelectorErrorMsg =
       'Cannot parse selector properly. It should be a valid JSON map.';
   static const String invalidFieldsErrorMsg =
@@ -34,8 +36,12 @@ class FindNodeParams {
       throw invalidLimitErrorMsg;
     }
 
-    if (params[limit] is! int || params[skip] == null) {
+    if (params[skip] is! int || params[skip] == null) {
       throw invalidSkipErrorMsg;
+    }
+
+    if (params[batchSize] is! int || params[batchSize] == null) {
+      throw invalidBatchSizeErrorMsg;
     }
 
     try {
@@ -91,9 +97,10 @@ class FindNode extends SimpleNode {
     final fields = JSON.decode(params[FindNodeParams.fields]) as List<String>;
     final limit = params[FindNodeParams.limit];
     final skip = params[FindNodeParams.skip];
+    final batchSize = params[FindNodeParams.batchSize];
 
-    final result =
-        await client.find(collectionName, selector, fields, limit, skip);
+    final result = await client.find(
+        collectionName, selector, fields, limit, skip, batchSize);
 
     final resultAsJsonString =
         JSON.encode(result, toEncodable: jsonifyMongoObjects);

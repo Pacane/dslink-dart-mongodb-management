@@ -17,12 +17,14 @@ void main() {
   final dateFields = '[]';
   final limit = 0;
   final skip = 0;
+  final batchSize = 20;
 
   setUp(() {
     validParams = {
       FindNodeParams.selector: selector,
       FindNodeParams.skip: skip,
       FindNodeParams.limit: limit,
+      FindNodeParams.batchSize: batchSize,
       FindNodeParams.fields: fields,
       FindNodeParams.dateFields: dateFields
     };
@@ -48,12 +50,12 @@ void main() {
 
     test('delegates to MongoClient', () async {
       when(client.findStreaming(collectionName, JSON.decode(selector),
-              JSON.decode(fields), limit, skip))
+              JSON.decode(fields), limit, skip, batchSize))
           .thenReturn(new Stream.empty());
       await node.onInvoke(validParams).toList();
 
       verify(client.findStreaming(collectionName, JSON.decode(selector),
-          JSON.decode(fields), limit, skip));
+          JSON.decode(fields), limit, skip, batchSize));
     });
 
     // This is because it is the way DSA manages streaming tables.
@@ -71,7 +73,7 @@ void main() {
               ])
           .toList();
       when(client.findStreaming(collectionName, JSON.decode(selector),
-              JSON.decode(fields), limit, skip))
+              JSON.decode(fields), limit, skip, batchSize))
           .thenReturn(findResult);
 
       final actual = await node.onInvoke(validParams).toList();
@@ -85,7 +87,7 @@ void main() {
       ];
       final streamResult = new Stream.fromIterable(findResult);
       when(client.findStreaming(collectionName, JSON.decode(selector),
-              JSON.decode(fields), limit, skip))
+              JSON.decode(fields), limit, skip, batchSize))
           .thenReturn(streamResult);
 
       expect(() => node.onInvoke(validParams).toList(), returnsNormally);
@@ -97,7 +99,7 @@ void main() {
       ];
       final streamResult = new Stream.fromIterable(findResult);
       when(client.findStreaming(collectionName, JSON.decode(selector),
-              JSON.decode(fields), limit, skip))
+              JSON.decode(fields), limit, skip, batchSize))
           .thenReturn(streamResult);
 
       expect(() => node.onInvoke(validParams).toList(), returnsNormally);
@@ -107,7 +109,7 @@ void main() {
       setUp(() {
         final dateFields = '["date"]';
         validParams[FindNodeParams.dateFields] = dateFields;
-        when(client.findStreaming(any, any, any, any, any))
+        when(client.findStreaming(any, any, any, any, any, any))
             .thenReturn(new Stream.empty());
       });
 
@@ -118,7 +120,7 @@ void main() {
         await node.onInvoke(validParams).toList();
 
         var actualSelector =
-            verify(client.findStreaming(any, captureAny, any, any, any))
+            verify(client.findStreaming(any, captureAny, any, any, any, any))
                 .captured[0];
         expect(actualSelector['date'], new isInstanceOf<DateTime>());
       });
@@ -137,7 +139,7 @@ void main() {
         await node.onInvoke(validParams).toList();
 
         var actualSelector =
-            verify(client.findStreaming(any, captureAny, any, any, any))
+            verify(client.findStreaming(any, captureAny, any, any, any, any))
                 .captured[0];
         expect(actualSelector['date']['\$lt'], new isInstanceOf<DateTime>());
         expect(actualSelector['date']['\$gt'], new isInstanceOf<DateTime>());

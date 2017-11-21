@@ -17,6 +17,7 @@ void main() {
   final dateFields = '[]';
   final limit = 0;
   final skip = 0;
+  final batchSize = 20;
 
   setUp(() {
     validParams = {
@@ -24,7 +25,8 @@ void main() {
       FindNodeParams.fields: fields,
       FindNodeParams.dateFields: dateFields,
       FindNodeParams.skip: skip,
-      FindNodeParams.limit: limit
+      FindNodeParams.limit: limit,
+      FindNodeParams.batchSize: batchSize
     };
   });
 
@@ -37,6 +39,8 @@ void main() {
           FindNodeParams.selector, FindNodeParams.invalidSelectorErrorMsg),
       const Tuple(FindNodeParams.limit, FindNodeParams.invalidLimitErrorMsg),
       const Tuple(FindNodeParams.skip, FindNodeParams.invalidSkipErrorMsg),
+      const Tuple(
+          FindNodeParams.batchSize, FindNodeParams.invalidBatchSizeErrorMsg),
     ];
 
     for (var testCase in testCases) {
@@ -113,7 +117,7 @@ void main() {
       await node.onInvoke(validParams);
 
       verify(client.find(collectionName, JSON.decode(selector),
-          JSON.decode(fields), limit, skip));
+          JSON.decode(fields), limit, skip, batchSize));
     });
 
     group('ISO dates are revived correctly as DateTime in selector', () {
@@ -129,7 +133,8 @@ void main() {
         await node.onInvoke(validParams);
 
         var actualSelector =
-            verify(client.find(any, captureAny, any, any, any)).captured[0];
+            verify(client.find(any, captureAny, any, any, any, any)).captured[
+                0];
         expect(actualSelector['date'], new isInstanceOf<DateTime>());
       });
 
@@ -147,7 +152,8 @@ void main() {
         await node.onInvoke(validParams);
 
         var actualSelector =
-            verify(client.find(any, captureAny, any, any, any)).captured[0];
+            verify(client.find(any, captureAny, any, any, any, any)).captured[
+                0];
         expect(actualSelector['date']['\$lt'], new isInstanceOf<DateTime>());
         expect(actualSelector['date']['\$gt'], new isInstanceOf<DateTime>());
       });
@@ -158,7 +164,7 @@ void main() {
         {'result': true}
       ];
       final expected = {'result': JSON.encode(findResult)};
-      when(client.find(any, any, any, any, any)).thenReturn(findResult);
+      when(client.find(any, any, any, any, any, any)).thenReturn(findResult);
 
       final actual = await node.onInvoke(validParams);
 
@@ -170,7 +176,7 @@ void main() {
         {'date': new DateTime.now()}
       ];
       when(client.find(collectionName, JSON.decode(selector),
-              JSON.decode(fields), limit, skip))
+              JSON.decode(fields), limit, skip, batchSize))
           .thenReturn(findResult);
 
       expect(() => node.onInvoke(validParams), returnsNormally);
@@ -181,7 +187,7 @@ void main() {
         {'_id': new ObjectId.fromHexString('5a037dcf275c5fe584428f72')}
       ];
       when(client.find(collectionName, JSON.decode(selector),
-              JSON.decode(fields), limit, skip))
+              JSON.decode(fields), limit, skip, batchSize))
           .thenReturn(findResult);
 
       expect(() => node.onInvoke(validParams), returnsNormally);
