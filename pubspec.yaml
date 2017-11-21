@@ -5,7 +5,8 @@ version: 0.0.1
 environment:
   sdk: '>=1.17.0 <2.0.0'
 dependencies:
-  mongo_dart: '^0.2.8'
+  mongo_dart:
+    git: https://github.com/IOT-DSA/mongo_dart.git
   pool: any
   dslink:
     git: https://github.com/IOT-DSA/sdk-dslink-dart

@@ -67,11 +67,12 @@ void main() {
 
     group('simple data', () {
       final collectionName = 'simple_data';
+      final batchSize = 20;
 
       test('empty map returns all data', () async {
         final selector = {};
-        final result =
-            await client.find(collectionName, selector, fields, limit, skip);
+        final result = await client.find(
+            collectionName, selector, fields, limit, skip, batchSize);
 
         validateAllSimpleData(result);
       });
@@ -80,8 +81,8 @@ void main() {
         final selector = {
           "name": {"\$regex": "mat.*", "\$options": "i"}
         };
-        final result =
-            await client.find(collectionName, selector, fields, limit, skip);
+        final result = await client.find(
+            collectionName, selector, fields, limit, skip, batchSize);
 
         expect(result, hasLength(1));
         expect(result[0]['name'], 'matt');
@@ -90,8 +91,8 @@ void main() {
       test('field projection is supported', () async {
         final selector = {'name': 'joel'};
         final fields = ['dob'];
-        final result =
-            await client.find(collectionName, selector, fields, limit, skip);
+        final result = await client.find(
+            collectionName, selector, fields, limit, skip, batchSize);
 
         expect(result, hasLength(1));
         expect(result[0].containsKey('name'), isFalse);
@@ -102,8 +103,8 @@ void main() {
         final limit = 2;
         final selector = {};
 
-        var result =
-            await client.find(collectionName, selector, fields, limit, skip);
+        var result = await client.find(
+            collectionName, selector, fields, limit, skip, batchSize);
 
         expect(result, hasLength(limit));
       });
@@ -112,8 +113,8 @@ void main() {
         final skip = 2;
         final selector = {};
 
-        var result =
-            await client.find(collectionName, selector, fields, limit, skip);
+        var result = await client.find(
+            collectionName, selector, fields, limit, skip, batchSize);
 
         expect(result[0]['name'], 'martine');
       });
@@ -124,8 +125,8 @@ void main() {
           r'$orderby': {'name': 1}
         };
 
-        var result =
-            await client.find(collectionName, selector, fields, limit, skip);
+        var result = await client.find(
+            collectionName, selector, fields, limit, skip, batchSize);
 
         var expected = copyAndSortResultsBy(result, 'name');
         expect(result, containsAllInOrder(expected));
@@ -135,7 +136,7 @@ void main() {
 
   group('findStream', () {
     final client = new MongoClient(uri, username, password);
-    final limit = 0, skip = 0, fields = [];
+    final limit = 0, skip = 0, batchSize = 20, fields = [];
     final selector = {};
 
     group('simple data', () {
@@ -143,7 +144,8 @@ void main() {
 
       test('empty map returns all data', () async {
         final result = await client
-            .findStreaming(collectionName, selector, fields, limit, skip)
+            .findStreaming(
+                collectionName, selector, fields, limit, skip, batchSize)
             .toList();
 
         validateAllSimpleData(result);
@@ -153,7 +155,8 @@ void main() {
         final limit = 2;
 
         var result = await client
-            .findStreaming(collectionName, selector, fields, limit, skip)
+            .findStreaming(
+                collectionName, selector, fields, limit, skip, batchSize)
             .toList();
 
         expect(result, hasLength(limit));
@@ -163,7 +166,8 @@ void main() {
         final skip = 2;
 
         var result = await client
-            .findStreaming(collectionName, selector, fields, limit, skip)
+            .findStreaming(
+                collectionName, selector, fields, limit, skip, batchSize)
             .toList();
 
         expect(result[0]['name'], 'martine');
@@ -173,7 +177,8 @@ void main() {
         final selector = {'name': 'joel'};
         final fields = ['dob'];
         final result = await client
-            .findStreaming(collectionName, selector, fields, limit, skip)
+            .findStreaming(
+                collectionName, selector, fields, limit, skip, batchSize)
             .toList();
 
         expect(result, hasLength(1));
