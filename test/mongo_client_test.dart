@@ -206,6 +206,116 @@ void main() {
       expect(result, 2);
     });
   });
+
+  group('aggregate', () {
+    final client = new MongoClient(uri, username, password);
+
+    test('throws an error when mongo returns an error', () async {
+      final collectionName = 'any';
+
+      // Should throw because _id isn't provided
+      await expectThrowsAsync(
+          () => client.aggregate(collectionName, [
+                {
+                  r'$group': {
+                    'avgDob': {r'$avg': r'$dob'}
+                  }
+                }
+              ]),
+          (String s) =>
+              s.contains('a group specification must include an _id'));
+    });
+
+    test('average', () async {
+      final collectionName = 'simple_data';
+
+      final result = await client.aggregate(collectionName, [
+        {
+          r'$group': {
+            '_id': 'dob',
+            'avgDob': {r'$avg': r'$dob'}
+          }
+        }
+      ]);
+
+      expect((result.first['avgDob'] as num).round(), 1988);
+    });
+
+    test('average with filtering', () async {
+      final collectionName = 'simple_data';
+
+      final result = await client.aggregate(collectionName, [
+        {
+          r'$match': {
+            'dob': {'\$lt': 1990}
+          }
+        },
+        {
+          r'$group': {
+            '_id': null,
+            'count': {'\$sum': 1}
+          }
+        }
+      ]);
+
+      expect((result.first['count'] as num).round(), 5);
+    });
+  });
+  group('aggregate to stream', () {
+    final client = new MongoClient(uri, username, password);
+
+    test('throws an error when mongo returns an error', () async {
+      final collectionName = 'any';
+
+      // Should throw because _id isn't provided
+      await expectThrowsAsync(
+          () => client.aggregateToStream(collectionName, [
+                {
+                  r'$group': {
+                    'avgDob': {r'$avg': r'$dob'}
+                  }
+                }
+              ]).toList(),
+          (String s) =>
+              s.contains('a group specification must include an _id'));
+    });
+
+    test('average', () async {
+      final collectionName = 'simple_data';
+
+      final result = await client.aggregateToStream(collectionName, [
+        {
+          r'$group': {
+            '_id': 'dob',
+            'avgDob': {r'$avg': r'$dob'}
+          }
+        }
+      ]).toList();
+
+      expect((result.first['avgDob'] as num).round(), 1988);
+    });
+
+    // TODO: See why this doesn't throw. It just returns an empty list.
+    test('average with filtering', () async {
+      final collectionName = 'simple_data';
+
+      final result = await client.aggregateToStream(collectionName, [
+        {
+          r'$match': {
+            'dob': {'\$lt': 1990}
+          }
+        },
+        {
+          r'$group': {
+            '_id': null,
+            'count': {'\$sum': 1}
+          }
+        }
+      ]).toList();
+
+      expect((result.first['count'] as num).round(), 5);
+    });
+  });
 }
 
 List<Map<String, dynamic>> copyAndSortResultsBy(

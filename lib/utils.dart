@@ -37,6 +37,9 @@ dynamic reviveDates(List<String> dateKeys, dynamic key, dynamic value) {
       } catch (e) {
         throw "Couldn't parse date in $key:$value";
       }
+    } else {
+      throw "Cannot decode $key. It's supposed to be a date, "
+          "but $value (${value.runtimeType}) cannot be converted to a date.";
     }
   } else {
     return value;
