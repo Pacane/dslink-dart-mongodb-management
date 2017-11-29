@@ -82,6 +82,13 @@ class FindStreamNode extends SimpleNode {
                 "max number of items in the query (0 equals no limit)",
           },
           {
+            "name": FindNodeParams.batchSize,
+            "type": "number",
+            "default": 20,
+            "description":
+                "max number of items to include in each database call",
+          },
+          {
             "name": FindNodeParams.skip,
             "type": "number",
             "default": 0,
