@@ -56,17 +56,6 @@ class FindNodeParams {
     checkIsListOfString(params[fields], invalidFieldsErrorMsg);
     checkIsListOfString(params[dateFields], invalidDateFieldsErrorMsg);
   }
-
-  static checkIsListOfString(String parameter, String errorMsg) {
-    try {
-      final decodedParam = JSON.decode(parameter);
-      if (!(decodedParam is List && decodedParam.every((i) => i is String))) {
-        throw errorMsg;
-      }
-    } catch (e) {
-      throw errorMsg;
-    }
-  }
 }
 
 class FindNode extends SimpleNode {

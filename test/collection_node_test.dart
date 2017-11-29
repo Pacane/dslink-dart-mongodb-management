@@ -42,5 +42,12 @@ void main() {
       verify(provider.setNode('$path/${CountNode.pathName}',
           argThat(const isInstanceOf<CountNode>())));
     });
+
+    test('aggregate node', () {
+      node.onCreated();
+
+      verify(provider.setNode('$path/${AggregateNode.pathName}',
+          argThat(const isInstanceOf<AggregateNode>())));
+    });
   });
 }

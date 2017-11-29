@@ -1,4 +1,5 @@
 export 'src/nodes/add_connection_node.dart';
+export 'src/nodes/aggregate_node.dart';
 export 'src/nodes/collection_node.dart';
 export 'src/nodes/count_node.dart';
 export 'src/nodes/database_node.dart';

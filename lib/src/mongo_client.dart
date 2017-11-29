@@ -97,6 +97,7 @@ class MongoClient {
     return db.getCollectionNames();
   }
 
+  /// Find documents with a JSON selector
   Future<List<Map<String, dynamic>>> find(
       String collectionName,
       Map<String, dynamic> selector,
@@ -104,21 +105,14 @@ class MongoClient {
       int limit,
       int skip,
       int batchSize) async {
-    final db = await connectionPool.connect();
-    final collection = db.collection(collectionName);
-
-    final sb = new SelectorBuilder()
-      ..raw(selector)
-      ..fields(fields)
-      ..limit(limit)
-      ..batchSize(batchSize)
-      ..skip(skip);
-
-    final result = await collection.find(sb).toList();
+    final result = await findStreaming(
+            collectionName, selector, fields, limit, skip, batchSize)
+        .toList();
 
     return result;
   }
 
+  /// Find documents with a JSON selector, but returns the result as a stream
   Stream<Map<String, dynamic>> findStreaming(
       String collectionName,
       Map<String, dynamic> selector,
@@ -139,6 +133,8 @@ class MongoClient {
     yield* collection.find(sb);
   }
 
+  /// Returns the amount of documents in a collection
+  /// respecting the provided selector
   Future<int> count(
       String collectionName, Map<String, dynamic> selector) async {
     final db = await connectionPool.connect();
@@ -147,6 +143,28 @@ class MongoClient {
     final count = await collection.count(selector);
 
     return count;
+  }
+
+  Future<List> aggregate(String collectionName, List<Map> pipeline) async {
+    final db = await connectionPool.connect();
+    final collection = db.collection(collectionName);
+
+    try {
+      final result = await collection.aggregate(pipeline);
+      return result['result'];
+    } catch (e) {
+      if (e is Map && e['ok'] == 0.0) {
+        throw e['errmsg'];
+      }
+    }
+  }
+
+  Stream<Map<String, dynamic>> aggregateToStream(
+      String collectionName, List<String> pipeline) async* {
+    final db = await connectionPool.connect();
+    final collection = db.collection(collectionName);
+
+    yield* collection.aggregateToStream(pipeline);
   }
 }
 

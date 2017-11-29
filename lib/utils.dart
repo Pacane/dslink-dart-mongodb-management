@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bson/bson.dart';
 import 'package:collection/collection.dart';
 
@@ -37,8 +39,33 @@ dynamic reviveDates(List<String> dateKeys, dynamic key, dynamic value) {
       } catch (e) {
         throw "Couldn't parse date in $key:$value";
       }
+    } else {
+      throw "Cannot decode $key. It's supposed to be a date, "
+          "but $value (${value.runtimeType}) cannot be converted to a date.";
     }
   } else {
     return value;
+  }
+}
+
+checkIsListOfString(String parameter, String errorMsg) {
+  try {
+    final decodedParam = JSON.decode(parameter);
+    if (!(decodedParam is List && decodedParam.every((i) => i is String))) {
+      throw errorMsg;
+    }
+  } catch (e) {
+    throw errorMsg;
+  }
+}
+
+checkIsListOfMaps(String parameter, String errorMsg) {
+  try {
+    final decodedParam = JSON.decode(parameter);
+    if (!(decodedParam is List && decodedParam.every((i) => i is Map))) {
+      throw errorMsg;
+    }
+  } catch (e) {
+    throw errorMsg;
   }
 }

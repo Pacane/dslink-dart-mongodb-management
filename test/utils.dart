@@ -5,6 +5,9 @@ expectThrowsAsync(func, dynamic expected) async {
     await func();
     fail("Should throw.");
   } catch (e) {
+    if (e is TestFailure) {
+      rethrow;
+    }
     expect(e, expected);
   }
 }
