@@ -86,7 +86,7 @@ class FindStreamNode extends SimpleNode {
             "type": "number",
             "default": 20,
             "description":
-            "max number of items to include in each database call",
+                "max number of items to include in each database call",
           },
           {
             "name": FindNodeParams.skip,
