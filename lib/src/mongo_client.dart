@@ -145,7 +145,7 @@ class MongoClient {
     return count;
   }
 
-  Future<List> aggregate(String collectionName, List<String> pipeline) async {
+  Future<List> aggregate(String collectionName, List<Map> pipeline) async {
     final db = await connectionPool.connect();
     final collection = db.collection(collectionName);
 

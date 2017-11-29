@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bson/bson.dart';
 import 'package:collection/collection.dart';
 
@@ -43,5 +45,27 @@ dynamic reviveDates(List<String> dateKeys, dynamic key, dynamic value) {
     }
   } else {
     return value;
+  }
+}
+
+checkIsListOfString(String parameter, String errorMsg) {
+  try {
+    final decodedParam = JSON.decode(parameter);
+    if (!(decodedParam is List && decodedParam.every((i) => i is String))) {
+      throw errorMsg;
+    }
+  } catch (e) {
+    throw errorMsg;
+  }
+}
+
+checkIsListOfMaps(String parameter, String errorMsg) {
+  try {
+    final decodedParam = JSON.decode(parameter);
+    if (!(decodedParam is List && decodedParam.every((i) => i is Map))) {
+      throw errorMsg;
+    }
+  } catch (e) {
+    throw errorMsg;
   }
 }
